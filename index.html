@@ -1,0 +1,4544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADHDIKTED — Professional Diesel Diagnostics | codedkota.com</title>
+<meta name="description" content="Enterprise diesel diagnostic platform. Live data. Fault analysis. AI-powered repair intelligence. Built for shops, fleets, and owner-operators.">
+<meta property="og:title" content="ADHDIKTED Diagnostics — codedkota.com">
+<meta property="og:description" content="The diagnostic platform built by wrenchers, for wrenchers. Live engine data. AI fault analysis. Revenue-generating shop tools.">
+<meta property="og:url" content="https://codedkota.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  /* ADHDIKTED BRAND TOKENS */
+  --void:#050709;
+  --deep:#080c10;
+  --plate:#0d1219;
+  --steel:#131b24;
+  --rim:#1a2535;
+  --wire:#243040;
+
+  /* SIGNAL ORANGE — the one bold risk */
+  --sig:#ff6b1a;
+  --sig2:#ff8c47;
+  --sig3:#ffb380;
+  --sigd:#1a0800;
+  --sigf:rgba(255,107,26,.08);
+  --sigf2:rgba(255,107,26,.15);
+  --sigborder:rgba(255,107,26,.3);
+
+  /* UTILITY */
+  --ok:#22c55e;
+  --warn:#eab308;
+  --alert:#ef4444;
+  --cyan:#22d3ee;
+  --purple:#a855f7;
+
+  /* TYPE */
+  --t:#dde8f0;
+  --t2:#7a9ab8;
+  --t3:#3a5570;
+  --t4:#1e3048;
+
+  --display:'Bebas Neue',sans-serif;
+  --body:'Space Grotesk',sans-serif;
+  --mono:'Space Mono',monospace;
+}
+
+html,body{
+  background:var(--void);
+  color:var(--t);
+  font-family:var(--body);
+  scroll-behavior:smooth;
+}
+
+/* ── SCAN LINES ATMOSPHERE ── */
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  pointer-events:none;z-index:9999;
+  background:repeating-linear-gradient(
+    0deg,transparent,transparent 2px,
+    rgba(0,0,0,.06) 2px,rgba(0,0,0,.06) 3px
+  );
+}
+
+/* ── NAV ── */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  display:flex;align-items:center;
+  padding:0 32px;height:60px;
+  background:rgba(5,7,9,.92);
+  border-bottom:1px solid var(--wire);
+  backdrop-filter:blur(12px);
+}
+.nav-brand{
+  font-family:var(--display);
+  font-size:26px;letter-spacing:3px;
+  background:linear-gradient(90deg,var(--sig),var(--sig2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.nav-sub{
+  font-family:var(--mono);font-size:8px;
+  letter-spacing:4px;color:var(--t3);
+  margin-left:12px;padding-left:12px;
+  border-left:1px solid var(--wire);
+}
+.nav-links{display:flex;gap:28px;margin-left:auto;align-items:center;}
+.nav-link{
+  font-family:var(--mono);font-size:10px;letter-spacing:2px;
+  color:var(--t3);cursor:pointer;transition:color .2s;
+  text-decoration:none;
+}
+.nav-link:hover{color:var(--sig2);}
+.nav-cta{
+  padding:8px 20px;
+  font-family:var(--mono);font-size:10px;letter-spacing:2px;
+  background:var(--sig);color:#fff;border:none;cursor:pointer;
+  clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+  transition:all .2s;
+}
+.nav-cta:hover{background:var(--sig2);box-shadow:0 0 24px rgba(255,107,26,.4);}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:120px 32px 80px;
+  position:relative;overflow:hidden;
+  text-align:center;
+}
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,107,26,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,107,26,.04) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+.hero-glow{
+  position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);
+  width:700px;height:700px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(255,107,26,.07) 0%,transparent 65%);
+  pointer-events:none;
+}
+.hero-eyebrow{
+  font-family:var(--mono);font-size:10px;letter-spacing:6px;
+  color:var(--sig);margin-bottom:20px;
+  border:1px solid var(--sigborder);
+  padding:5px 16px;display:inline-block;
+  background:var(--sigf);
+}
+.hero-title{
+  font-family:var(--display);
+  font-size:clamp(72px,12vw,160px);
+  line-height:.92;letter-spacing:4px;
+  background:linear-gradient(135deg,
+    var(--t) 0%,
+    var(--sig2) 40%,
+    var(--sig) 60%,
+    var(--t) 100%
+  );
+  background-size:200% auto;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  animation:titleshine 6s linear infinite;
+  margin-bottom:8px;
+}
+@keyframes titleshine{
+  0%{background-position:0% center}
+  100%{background-position:200% center}
+}
+.hero-domain{
+  font-family:var(--mono);font-size:13px;letter-spacing:6px;
+  color:var(--t3);margin-bottom:32px;
+}
+.hero-deck{
+  font-size:18px;line-height:1.7;color:var(--t2);
+  max-width:580px;margin:0 auto 48px;font-weight:300;
+}
+.hero-deck strong{color:var(--t);font-weight:600;}
+.hero-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
+.btn-primary{
+  padding:16px 40px;
+  font-family:var(--display);font-size:20px;letter-spacing:4px;
+  background:linear-gradient(135deg,var(--sigd),#200d00);
+  border:1px solid var(--sig);color:var(--sig2);
+  cursor:pointer;position:relative;overflow:hidden;
+  clip-path:polygon(14px 0%,100% 0%,calc(100% - 14px) 100%,0% 100%);
+  transition:all .3s;text-decoration:none;display:inline-block;
+}
+.btn-primary:hover{
+  box-shadow:0 0 50px rgba(255,107,26,.35);
+  background:linear-gradient(135deg,#200d00,#2a1000);
+  color:var(--sig3);
+}
+.btn-shine{
+  position:absolute;inset:0;
+  background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.07) 50%,transparent 65%);
+  animation:shine 3s infinite;
+}
+@keyframes shine{0%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+.btn-ghost{
+  padding:16px 40px;
+  font-family:var(--display);font-size:20px;letter-spacing:4px;
+  background:transparent;border:1px solid var(--wire);
+  color:var(--t2);cursor:pointer;transition:all .2s;
+  clip-path:polygon(14px 0%,100% 0%,calc(100% - 14px) 100%,0% 100%);
+  text-decoration:none;display:inline-block;
+}
+.btn-ghost:hover{border-color:var(--t3);color:var(--t);}
+
+/* ── STATS STRIP ── */
+.stats{
+  background:var(--deep);
+  border-top:1px solid var(--wire);
+  border-bottom:1px solid var(--wire);
+  padding:28px 32px;
+  display:flex;justify-content:center;gap:0;flex-wrap:wrap;
+}
+.stat{
+  display:flex;flex-direction:column;align-items:center;
+  padding:0 48px;border-right:1px solid var(--wire);
+}
+.stat:last-child{border-right:none;}
+.stat-n{
+  font-family:var(--display);font-size:44px;
+  color:var(--sig);line-height:1;
+}
+.stat-l{
+  font-family:var(--mono);font-size:8px;letter-spacing:3px;
+  color:var(--t3);margin-top:4px;
+}
+
+/* ── SECTIONS ── */
+.section{padding:100px 32px;max-width:1200px;margin:0 auto;}
+.sh{
+  font-family:var(--mono);font-size:10px;letter-spacing:6px;
+  color:var(--sig);margin-bottom:16px;
+}
+.section-title{
+  font-family:var(--display);font-size:clamp(42px,6vw,80px);
+  line-height:.95;color:var(--t);margin-bottom:24px;
+}
+.section-title span{color:var(--sig);}
+
+/* ── FEATURE GRID ── */
+.feat-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;background:var(--wire);margin-top:60px;
+}
+.feat{
+  background:var(--deep);padding:36px 32px;
+  position:relative;overflow:hidden;
+  transition:background .3s;
+}
+.feat:hover{background:var(--plate);}
+.feat::before{
+  content:'';position:absolute;top:0;left:0;right:0;
+  height:2px;background:transparent;transition:background .3s;
+}
+.feat:hover::before{background:linear-gradient(90deg,transparent,var(--sig),transparent);}
+.feat-icon{
+  font-size:28px;margin-bottom:16px;display:block;
+}
+.feat-title{
+  font-family:var(--display);font-size:22px;letter-spacing:2px;
+  color:var(--t);margin-bottom:8px;
+}
+.feat-desc{font-size:14px;color:var(--t2);line-height:1.7;}
+.feat-tag{
+  margin-top:16px;
+  font-family:var(--mono);font-size:8px;letter-spacing:2px;
+  padding:3px 8px;display:inline-block;
+  border:1px solid var(--sigborder);color:var(--sig2);
+  background:var(--sigf);
+}
+
+/* ── REVENUE SECTION ── */
+.revenue{
+  background:var(--deep);
+  border-top:1px solid var(--wire);
+  border-bottom:1px solid var(--wire);
+  padding:100px 32px;
+}
+.rev-inner{max-width:1200px;margin:0 auto;}
+.rev-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:24px;margin-top:60px;
+}
+.rev-card{
+  border:1px solid var(--wire);
+  background:var(--plate);
+  padding:32px 28px;
+  position:relative;overflow:hidden;
+}
+.rev-card::after{
+  content:'';
+  position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--sig),transparent);
+}
+.rev-num{
+  font-family:var(--display);font-size:80px;
+  color:var(--sigf2);line-height:1;
+  position:absolute;top:16px;right:20px;
+  border:none;
+  -webkit-text-stroke:1px var(--sigborder);
+  -webkit-text-fill-color:transparent;
+}
+.rev-label{
+  font-family:var(--mono);font-size:8px;letter-spacing:4px;
+  color:var(--sig);margin-bottom:12px;
+}
+.rev-title{
+  font-family:var(--display);font-size:28px;
+  color:var(--t);margin-bottom:10px;
+}
+.rev-desc{font-size:14px;color:var(--t2);line-height:1.7;}
+.rev-est{
+  margin-top:20px;padding:10px 14px;
+  background:var(--sigf);border:1px solid var(--sigborder);
+  font-family:var(--mono);font-size:10px;color:var(--sig2);
+  letter-spacing:1px;
+}
+
+/* ── PRICING ── */
+.pricing-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:24px;margin-top:60px;
+}
+.price-card{
+  border:1px solid var(--wire);
+  background:var(--plate);
+  padding:36px 28px;
+}
+.price-card.featured{
+  border-color:var(--sig);
+  background:linear-gradient(180deg,var(--sigf),var(--plate));
+  position:relative;
+}
+.price-card.featured::before{
+  content:'MOST POPULAR';
+  position:absolute;top:-1px;left:50%;transform:translateX(-50%);
+  font-family:var(--mono);font-size:8px;letter-spacing:3px;
+  background:var(--sig);color:#fff;padding:4px 16px;
+}
+.price-tier{
+  font-family:var(--mono);font-size:9px;letter-spacing:4px;
+  color:var(--t3);margin-bottom:12px;
+}
+.price-name{
+  font-family:var(--display);font-size:32px;
+  color:var(--t);margin-bottom:20px;
+}
+.price-amount{
+  font-family:var(--display);font-size:56px;
+  color:var(--sig);line-height:1;
+}
+.price-period{
+  font-family:var(--mono);font-size:10px;color:var(--t3);
+  margin-bottom:28px;
+}
+.price-features{list-style:none;margin-bottom:28px;}
+.price-features li{
+  font-size:13px;color:var(--t2);
+  padding:8px 0;border-bottom:1px solid var(--wire);
+  display:flex;gap:10px;
+}
+.price-features li::before{content:'→';color:var(--sig);font-family:var(--mono);}
+.price-btn{
+  width:100%;padding:13px;
+  font-family:var(--display);font-size:16px;letter-spacing:3px;
+  background:transparent;border:1px solid var(--sig);
+  color:var(--sig2);cursor:pointer;transition:all .2s;
+  clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+}
+.price-btn:hover,.price-card.featured .price-btn{
+  background:var(--sig);color:#fff;
+}
+
+/* ── LEAD FORM ── */
+.lead-section{
+  background:var(--deep);
+  border-top:1px solid var(--wire);
+  padding:100px 32px;text-align:center;
+}
+.lead-inner{max-width:600px;margin:0 auto;}
+.lead-form{
+  display:flex;flex-direction:column;gap:14px;
+  margin-top:40px;text-align:left;
+}
+.lead-input{
+  background:var(--plate);
+  border:1px solid var(--wire);
+  color:var(--t);
+  font-family:var(--mono);font-size:12px;
+  padding:14px 18px;outline:none;
+  transition:border-color .2s;
+  clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
+}
+.lead-input:focus{border-color:var(--sig);}
+.lead-input::placeholder{color:var(--t3);}
+.lead-select{
+  background:var(--plate);
+  border:1px solid var(--wire);
+  color:var(--t);
+  font-family:var(--mono);font-size:12px;
+  padding:14px 18px;outline:none;
+  cursor:pointer;
+}
+.lead-btn{
+  padding:16px;
+  font-family:var(--display);font-size:20px;letter-spacing:4px;
+  background:var(--sig);color:#fff;
+  border:none;cursor:pointer;
+  clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);
+  transition:all .2s;
+}
+.lead-btn:hover{background:var(--sig2);box-shadow:0 0 40px rgba(255,107,26,.4);}
+
+/* ── FOOTER ── */
+.footer{
+  background:var(--void);
+  border-top:1px solid var(--wire);
+  padding:48px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:20px;
+}
+.footer-brand{
+  font-family:var(--display);font-size:22px;letter-spacing:3px;
+  background:linear-gradient(90deg,var(--sig),var(--sig2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.footer-copy{
+  font-family:var(--mono);font-size:9px;letter-spacing:2px;
+  color:var(--t3);
+}
+.footer-links{display:flex;gap:24px;}
+.footer-link{
+  font-family:var(--mono);font-size:9px;letter-spacing:1px;
+  color:var(--t3);cursor:pointer;transition:color .2s;
+  text-decoration:none;
+}
+.footer-link:hover{color:var(--sig2);}
+
+/* ══════════════════════════════════
+   THE APP — /app route
+══════════════════════════════════ */
+.app-shell{
+  display:flex;flex-direction:column;
+  height:100vh;overflow:hidden;
+}
+.app-topbar{
+  display:flex;align-items:stretch;
+  background:var(--deep);
+  border-bottom:2px solid rgba(255,107,26,.3);
+  flex-shrink:0;min-height:54px;
+  position:relative;
+}
+.app-topbar::after{
+  content:'';position:absolute;bottom:-4px;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--sig),var(--sig2),var(--sig),transparent);
+}
+.app-brand{
+  display:flex;align-items:center;gap:10px;
+  padding:0 20px;border-right:1px solid var(--rim);
+  background:linear-gradient(90deg,var(--sigf),transparent);
+  min-width:180px;
+}
+.app-bname{
+  font-family:var(--display);font-size:20px;letter-spacing:3px;
+  background:linear-gradient(90deg,var(--sig2),var(--sig3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.app-bsub{
+  font-family:var(--mono);font-size:7px;letter-spacing:3px;color:var(--t3);
+}
+.app-rigs{
+  display:flex;align-items:center;gap:6px;padding:0 14px;
+  border-right:1px solid var(--rim);
+}
+.rig-pill{
+  display:flex;align-items:center;gap:5px;
+  padding:5px 12px;border:1px solid var(--rim);
+  background:transparent;color:var(--t2);cursor:pointer;
+  font-family:var(--mono);font-size:9px;letter-spacing:1px;
+  transition:all .15s;
+  clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);
+}
+.rig-pill:hover{border-color:var(--sig);color:var(--sig2);}
+.rig-pill.on{background:var(--sigf);border-color:var(--sig);color:var(--sig2);}
+.rig-dot{width:6px;height:6px;border-radius:50%;}
+.app-right{
+  display:flex;align-items:center;margin-left:auto;
+}
+.app-seg{
+  display:flex;align-items:center;gap:6px;
+  padding:0 14px;border-left:1px solid var(--rim);
+  font-family:var(--mono);font-size:9px;color:var(--t3);height:100%;
+}
+.live-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--ok);box-shadow:0 0 6px var(--ok);
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.app-tabs{
+  display:flex;background:var(--plate);
+  border-bottom:1px solid var(--rim);
+  flex-shrink:0;overflow-x:auto;scrollbar-width:none;
+}
+.app-tabs::-webkit-scrollbar{display:none;}
+.app-tab{
+  padding:10px 16px;
+  font-family:var(--display);font-size:9px;
+  font-weight:700;letter-spacing:2px;
+  color:var(--t3);cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all .2s;white-space:nowrap;
+}
+.app-tab:hover{color:var(--t2);}
+.app-tab.on{color:var(--sig2);border-bottom-color:var(--sig);}
+.app-main{
+  flex:1;overflow-y:auto;
+  padding:18px 20px 50px;
+  background:var(--void);
+}
+.app-main::-webkit-scrollbar{width:3px;}
+.app-main::-webkit-scrollbar-thumb{background:rgba(255,107,26,.3);}
+
+/* ── AD AGENT COMPONENTS ── */
+.ad-strip{
+  display:flex;align-items:center;gap:14px;
+  background:var(--plate);
+  border:1px solid var(--wire);
+  border-left:3px solid var(--sig);
+  padding:10px 16px;margin-bottom:14px;
+  position:relative;overflow:hidden;
+}
+.ad-strip::before{
+  content:'SPONSORED';
+  position:absolute;top:4px;right:8px;
+  font-family:var(--mono);font-size:7px;letter-spacing:2px;
+  color:var(--t3);
+}
+.ad-logo{
+  width:32px;height:32px;border-radius:4px;
+  background:var(--steel);display:flex;align-items:center;
+  justify-content:center;font-family:var(--mono);font-size:8px;
+  color:var(--sig2);flex-shrink:0;border:1px solid var(--sigborder);
+}
+.ad-body{flex:1;}
+.ad-name{
+  font-family:var(--mono);font-size:10px;color:var(--t);
+  letter-spacing:1px;margin-bottom:2px;
+}
+.ad-sub{font-size:11px;color:var(--t2);}
+.ad-cta{
+  padding:6px 14px;
+  font-family:var(--mono);font-size:9px;letter-spacing:1px;
+  background:var(--sig);color:#fff;border:none;cursor:pointer;
+  clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);
+  white-space:nowrap;transition:all .15s;flex-shrink:0;
+}
+.ad-cta:hover{background:var(--sig2);}
+
+.part-ad{
+  border:1px solid var(--sigborder);
+  background:linear-gradient(135deg,var(--sigf),var(--plate));
+  padding:12px 16px;margin-top:8px;
+  display:flex;align-items:center;gap:12px;
+  position:relative;
+}
+.part-ad::before{
+  content:'PARTS MATCH';
+  position:absolute;top:-1px;left:0;
+  font-family:var(--mono);font-size:7px;letter-spacing:2px;
+  background:var(--sig);color:#fff;padding:2px 8px;
+}
+.part-ad-info{flex:1;margin-top:8px;}
+.part-ad-name{
+  font-family:var(--mono);font-size:10px;color:var(--sig2);
+  margin-bottom:3px;
+}
+.part-ad-price{
+  font-family:var(--display);font-size:20px;color:var(--ok);
+}
+.part-ad-src{
+  font-family:var(--mono);font-size:8px;color:var(--t3);
+}
+.part-ad-btn{
+  padding:8px 16px;
+  font-family:var(--mono);font-size:9px;
+  background:transparent;border:1px solid var(--ok);
+  color:var(--ok);cursor:pointer;transition:all .15s;
+  clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);
+}
+.part-ad-btn:hover{background:var(--Gf);border-color:var(--ok);}
+
+/* ── APP CONTENT BLOCKS ── */
+.blk-sh{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:14px;font-family:var(--mono);
+  font-size:9px;font-weight:700;letter-spacing:5px;
+  color:var(--sig);text-transform:uppercase;
+}
+.blk-sh::after{
+  content:'';flex:1;height:1px;
+  background:linear-gradient(90deg,rgba(255,107,26,.3),transparent);
+}
+.row-flex{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;flex-wrap:wrap;gap:8px;
+}
+.chip{
+  font-family:var(--mono);font-size:8px;
+  padding:3px 10px;letter-spacing:1px;border:1px solid;
+}
+.chip-ok{border-color:rgba(34,197,94,.4);color:var(--ok);background:rgba(34,197,94,.06);}
+.chip-warn{border-color:rgba(234,179,8,.4);color:var(--warn);background:rgba(234,179,8,.06);}
+.chip-alert{border-color:rgba(239,68,68,.4);color:var(--alert);background:rgba(239,68,68,.06);}
+.chip-sig{border-color:var(--sigborder);color:var(--sig2);background:var(--sigf);}
+.sim-notice{
+  font-family:var(--mono);font-size:9px;letter-spacing:2px;
+  color:var(--cyan);padding:8px 14px;
+  border:1px solid rgba(34,211,238,.2);
+  background:rgba(34,211,238,.04);
+  margin-bottom:14px;text-align:center;
+}
+
+/* DASH */
+.dash6{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.dc{
+  background:var(--deep);border:1px solid var(--rim);
+  padding:14px 16px;position:relative;overflow:hidden;
+  clip-path:polygon(7px 0%,100% 0%,calc(100% - 7px) 100%,0% 100%);
+}
+.dc::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,var(--sig),transparent);
+}
+.dc.hot::before{background:linear-gradient(90deg,var(--alert),transparent);}
+.dc-lbl{font-family:var(--mono);font-size:8px;color:var(--t3);letter-spacing:3px;margin-bottom:6px;}
+.dc-val{font-family:var(--display);font-size:24px;font-weight:900;line-height:1;}
+.dc-unit{font-family:var(--mono);font-size:8px;color:var(--t2);margin-left:4px;}
+.dc-bar{height:2px;background:var(--rim);margin-top:10px;}
+.dc-fill{height:100%;transition:width .5s,background .3s;}
+
+/* GAUGE GRID */
+.gg{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;}
+.gauge{
+  background:var(--deep);border:1px solid var(--rim);
+  padding:11px 13px;transition:all .3s;
+}
+.gauge.hot{border-color:var(--alert);background:rgba(239,68,68,.06);}
+.g-lbl{font-family:var(--mono);font-size:8px;color:var(--t3);letter-spacing:2px;margin-bottom:4px;}
+.g-val{font-family:var(--display);font-size:17px;font-weight:700;line-height:1;margin-bottom:4px;}
+.g-unit{font-family:var(--mono);font-size:8px;color:var(--t2);margin-left:3px;}
+.g-bar{height:3px;background:var(--rim);border-radius:2px;overflow:hidden;}
+.g-fill{height:100%;border-radius:2px;transition:width .4s,background .3s;}
+.g-range{display:flex;justify-content:space-between;margin-top:2px;font-family:var(--mono);font-size:7px;color:var(--t4);}
+
+/* DTC */
+.dtc-list{display:flex;flex-direction:column;gap:7px;}
+.dtc-row{
+  display:flex;align-items:center;gap:10px;
+  background:var(--deep);border:1px solid var(--rim);
+  padding:10px 13px;border-left-width:3px;flex-wrap:wrap;
+}
+.dtc-row.alert{border-left-color:var(--alert);}
+.dtc-row.warn{border-left-color:var(--warn);}
+.dtc-code{font-family:var(--mono);font-size:10px;color:var(--sig2);min-width:140px;}
+.dtc-desc{font-size:12px;color:var(--t2);flex:1;}
+.dtc-mod{font-family:var(--mono);font-size:8px;color:var(--t3);padding:2px 6px;border:1px solid var(--rim);}
+.dtc-ai-btn{
+  font-family:var(--mono);font-size:8px;padding:3px 9px;
+  border:1px solid rgba(34,211,238,.4);color:var(--cyan);
+  background:transparent;cursor:pointer;
+}
+.dtc-clr-btn{
+  font-family:var(--mono);font-size:8px;padding:3px 9px;
+  border:1px solid rgba(239,68,68,.4);color:var(--alert);
+  background:transparent;cursor:pointer;
+}
+.dtc-clr-btn:disabled{opacity:.3;cursor:not-allowed;}
+.dtc-explain{
+  margin-top:6px;background:var(--steel);
+  border:1px solid var(--rim);border-left:3px solid var(--cyan);
+  padding:11px 13px;font-size:12px;color:var(--t);
+  line-height:1.7;white-space:pre-wrap;
+}
+
+/* ACTUATORS */
+.act-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.act-card{
+  background:var(--deep);border:1px solid var(--rim);
+  padding:14px;transition:border-color .3s;
+}
+.act-card.run{border-color:var(--ok);background:rgba(34,197,94,.04);}
+.act-name{font-family:var(--display);font-size:13px;letter-spacing:1px;color:var(--sig2);margin-bottom:3px;}
+.act-desc{font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:10px;}
+.act-row{display:flex;align-items:center;gap:9px;}
+.risk-low{border:1px solid rgba(34,197,94,.3);color:var(--ok);background:rgba(34,197,94,.06);padding:2px 6px;font-family:var(--mono);font-size:8px;}
+.risk-med{border:1px solid var(--sigborder);color:var(--sig2);background:var(--sigf);padding:2px 6px;font-family:var(--mono);font-size:8px;}
+.act-btn{
+  margin-left:auto;padding:5px 13px;
+  font-family:var(--mono);font-size:9px;letter-spacing:2px;
+  background:transparent;cursor:pointer;transition:all .15s;
+}
+.act-idle{border:1px solid var(--rim);color:var(--t2);}
+.act-idle:hover:not(:disabled){border-color:var(--ok);color:var(--ok);}
+.act-going{border:1px solid var(--ok);color:var(--ok);animation:blink .6s infinite;}
+.act-btn:disabled{opacity:.35;cursor:not-allowed;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.act-pbar{height:3px;background:var(--rim);margin-top:10px;overflow:hidden;}
+.act-pfill{height:100%;background:linear-gradient(90deg,var(--sig),var(--ok));transition:width .2s;}
+.act-result{
+  margin-top:7px;font-family:var(--mono);font-size:9px;
+  padding:5px 9px;border:1px solid var(--rim);color:var(--t2);background:var(--plate);
+}
+.act-result.pass{border-color:var(--ok);color:var(--ok);background:rgba(34,197,94,.06);}
+.act-result.fail{border-color:var(--alert);color:var(--alert);background:rgba(239,68,68,.06);}
+
+/* AI */
+.ai-shell{display:flex;flex-direction:column;height:calc(100vh - 170px);}
+.ai-msgs{flex:1;overflow-y:auto;padding-bottom:10px;}
+.ai-msgs::-webkit-scrollbar{width:3px;}
+.ai-msgs::-webkit-scrollbar-thumb{background:rgba(255,107,26,.3);}
+.ai-msg{display:flex;gap:9px;margin-bottom:12px;}
+.ai-msg.u{flex-direction:row-reverse;}
+.ai-av{
+  width:28px;height:28px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:9px;
+  border:1px solid var(--rim);background:var(--plate);
+  clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);
+}
+.ai-bub{
+  max-width:78%;padding:11px 14px;
+  font-size:12px;line-height:1.75;color:var(--t);
+  background:var(--deep);border:1px solid var(--rim);
+  border-left:3px solid var(--cyan);
+}
+.ai-msg.u .ai-bub{border-left:3px solid var(--sig);background:var(--sigf);}
+.q-btns{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.q-btn{
+  font-family:var(--mono);font-size:9px;padding:4px 11px;
+  letter-spacing:1px;border:1px solid var(--rim);
+  background:transparent;color:var(--t2);cursor:pointer;transition:all .15s;
+}
+.q-btn:hover{border-color:var(--sig);color:var(--sig2);}
+.ai-row{display:flex;gap:7px;padding-top:10px;border-top:1px solid var(--rim);}
+.ai-in{
+  flex:1;background:var(--plate);border:1px solid var(--rim);
+  color:var(--t);font-family:var(--mono);font-size:11px;
+  padding:10px 13px;outline:none;
+  clip-path:polygon(5px 0%,100% 0%,calc(100% - 5px) 100%,0% 100%);
+  transition:border-color .2s;
+}
+.ai-in:focus{border-color:var(--sig);}
+.ai-in::placeholder{color:var(--t3);}
+.ai-go{
+  padding:10px 18px;font-family:var(--display);font-size:10px;
+  font-weight:700;letter-spacing:3px;background:var(--sigf);
+  border:1px solid var(--sig);color:var(--sig2);cursor:pointer;transition:all .15s;
+  clip-path:polygon(5px 0%,100% 0%,calc(100% - 5px) 100%,0% 100%);
+}
+.ai-go:disabled{opacity:.35;cursor:not-allowed;}
+.typing-dots{display:flex;gap:4px;padding:4px 0;}
+.typing-dots span{width:5px;height:5px;border-radius:50%;background:var(--sig2);animation:td 1s infinite;}
+.typing-dots span:nth-child(2){animation-delay:.15s;}
+.typing-dots span:nth-child(3){animation-delay:.3s;}
+@keyframes td{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+
+/* REGEN */
+.dpf-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.dpf-c{background:var(--deep);border:1px solid var(--rim);padding:13px;}
+.dpf-lbl{font-family:var(--mono);font-size:8px;color:var(--t3);letter-spacing:3px;margin-bottom:7px;}
+.dpf-val{font-family:var(--display);font-size:26px;font-weight:900;margin-bottom:5px;}
+.dpf-bar{height:6px;background:var(--rim);border-radius:3px;overflow:hidden;margin-bottom:4px;}
+.dpf-fill{height:100%;border-radius:3px;transition:width .5s,background .3s;}
+.dpf-note{font-family:var(--mono);font-size:9px;color:var(--t2);}
+.regen-btn{
+  width:100%;padding:14px;font-family:var(--display);
+  font-size:14px;font-weight:700;letter-spacing:4px;
+  background:linear-gradient(135deg,#150300,#220800);
+  border:1px solid var(--alert);color:var(--alert);cursor:pointer;
+  clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%);
+  transition:all .2s;
+}
+.regen-btn:disabled{opacity:.4;cursor:not-allowed;}
+.regen-running{
+  width:100%;padding:14px;text-align:center;
+  font-family:var(--display);font-size:14px;letter-spacing:4px;
+  color:var(--alert);border:1px solid var(--alert);
+  background:rgba(239,68,68,.06);animation:blink .8s infinite;
+}
+.regen-log{
+  background:var(--steel);border:1px solid var(--rim);
+  padding:10px;font-family:var(--mono);font-size:10px;
+  max-height:130px;overflow-y:auto;margin-top:10px;
+  line-height:2.1;color:var(--t2);
+}
+.regen-log .ok{color:var(--ok);}
+.regen-log .hot{color:var(--alert);}
+.regen-log .inf{color:var(--cyan);}
+
+/* TUNE */
+.tsearch{
+  background:var(--plate);border:1px solid var(--rim);
+  color:var(--t);font-family:var(--mono);font-size:11px;
+  padding:9px 13px;outline:none;width:100%;margin-bottom:13px;
+  clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
+  transition:border-color .2s;
+}
+.tsearch:focus{border-color:var(--sig);}
+.tgrp{background:var(--deep);border:1px solid var(--rim);margin-bottom:10px;overflow:hidden;}
+.tghdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;background:var(--plate);border-bottom:1px solid var(--rim);
+  cursor:pointer;
+}
+.tghdr:hover{background:var(--sigf);}
+.tg-name{font-family:var(--display);font-size:10px;font-weight:700;letter-spacing:3px;color:var(--sig);}
+.tg-body{padding:12px;}
+.p-row{
+  display:grid;grid-template-columns:1fr auto auto auto;
+  align-items:center;gap:10px;
+  padding:7px 0;border-bottom:1px solid var(--rim);
+}
+.p-row:last-child{border-bottom:none;}
+.p-lbl{font-size:12px;color:var(--t);}
+.p-sub{font-family:var(--mono);font-size:8px;color:var(--t3);margin-top:1px;}
+.p-inp{
+  background:var(--steel);border:1px solid var(--rim);
+  color:var(--t);font-family:var(--mono);font-size:12px;
+  padding:5px 8px;width:80px;outline:none;text-align:right;
+  transition:border-color .2s;
+}
+.p-inp:focus{border-color:var(--sig);}
+.p-inp:disabled{opacity:.35;cursor:not-allowed;}
+.p-unit{font-family:var(--mono);font-size:9px;color:var(--t3);min-width:36px;}
+.risk-low2{border:1px solid rgba(34,197,94,.3);color:var(--ok);background:rgba(34,197,94,.06);padding:2px 6px;font-family:var(--mono);font-size:8px;}
+.risk-med2{border:1px solid var(--sigborder);color:var(--sig2);background:var(--sigf);padding:2px 6px;font-family:var(--mono);font-size:8px;}
+.risk-high{border:1px solid rgba(239,68,68,.3);color:var(--alert);background:rgba(239,68,68,.06);padding:2px 6px;font-family:var(--mono);font-size:8px;}
+.write-btn{
+  width:100%;padding:13px;margin-top:14px;
+  font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:5px;
+  background:linear-gradient(135deg,var(--sigd),#1a0800);
+  border:1px solid var(--sig);color:var(--sig2);cursor:pointer;
+  clip-path:polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%);
+  transition:all .2s;
+}
+.write-btn:disabled{opacity:.35;cursor:not-allowed;}
+
+/* ADMIN */
+.unlock-bar{
+  display:flex;align-items:center;gap:10px;
+  padding:13px 18px;border:1px solid rgba(34,197,94,.4);
+  background:rgba(34,197,94,.06);font-family:var(--mono);
+  font-size:11px;color:var(--ok);margin-bottom:14px;
+}
+.lock-out{
+  margin-left:auto;padding:7px 16px;
+  border:1px solid var(--alert);background:transparent;
+  color:var(--alert);font-family:var(--mono);font-size:10px;
+  letter-spacing:2px;cursor:pointer;
+}
+.perm-list{display:flex;flex-direction:column;gap:5px;}
+.perm-item{
+  font-family:var(--mono);font-size:10px;color:var(--t2);
+  letter-spacing:1px;padding:5px 0;border-bottom:1px solid var(--rim);
+}
+.perm-yes{color:var(--ok);margin-right:8px;}
+.perm-no{color:var(--alert);margin-right:8px;}
+
+/* LOGIN */
+.login-wrap{
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  min-height:100vh;background:var(--void);
+  position:relative;
+}
+.login-glow{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:500px;height:500px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(255,107,26,.07) 0%,transparent 65%);
+  pointer-events:none;
+}
+.login-title{
+  font-family:var(--display);
+  font-size:clamp(42px,8vw,90px);
+  letter-spacing:6px;
+  background:linear-gradient(135deg,var(--sig),var(--sig2),var(--sig3),var(--sig2),var(--sig));
+  background-size:200% auto;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  animation:titleshine 4s linear infinite;
+  margin-bottom:6px;
+}
+.login-sub{
+  font-family:var(--mono);font-size:9px;letter-spacing:5px;
+  color:var(--t3);margin-bottom:48px;
+}
+.login-boxes{display:flex;flex-direction:column;gap:14px;width:340px;}
+.login-box{
+  background:var(--deep);border:1px solid var(--rim);
+  padding:22px;position:relative;
+}
+.login-box::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--sig),transparent);
+}
+.login-box.admin-box::before{
+  background:linear-gradient(90deg,transparent,var(--alert),transparent);
+}
+.login-box-title{
+  font-family:var(--display);font-size:11px;font-weight:700;
+  letter-spacing:4px;margin-bottom:13px;
+}
+.login-box .login-box-title{color:var(--sig2);}
+.login-box.admin-box .login-box-title{color:var(--alert);}
+.login-input{
+  width:100%;background:var(--steel);border:1px solid var(--rim);
+  color:var(--t);font-family:var(--mono);font-size:12px;
+  padding:9px 13px;outline:none;margin-bottom:11px;
+  transition:border-color .2s;
+}
+.login-input:focus{border-color:var(--sig);}
+.login-input::placeholder{color:var(--t3);}
+.login-btn{
+  width:100%;padding:11px;font-family:var(--display);
+  font-size:11px;font-weight:700;letter-spacing:4px;
+  border:1px solid;background:transparent;cursor:pointer;transition:all .2s;
+}
+.login-btn.mech{border-color:var(--sig);color:var(--sig2);}
+.login-btn.mech:hover{background:var(--sigf);}
+.login-btn.adm{border-color:var(--alert);color:var(--alert);}
+.login-btn.adm:hover{background:rgba(239,68,68,.06);}
+.login-err{font-family:var(--mono);font-size:9px;color:var(--alert);margin-top:7px;letter-spacing:1px;}
+.login-domain{
+  margin-top:28px;font-family:var(--mono);font-size:9px;
+  letter-spacing:4px;color:var(--t3);
+}
+
+/* DYNO */
+.dyno-wrap{
+  background:var(--deep);border:1px solid var(--rim);
+  padding:18px;margin-bottom:16px;
+}
+.dyno-canvas{
+  width:100%;height:160px;background:var(--steel);
+  border:1px solid var(--rim);position:relative;
+  overflow:hidden;margin-bottom:12px;
+}
+.dyno-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.dyno-stat{
+  text-align:center;padding:11px;
+  background:var(--plate);border:1px solid var(--rim);
+}
+.dyno-stat-n{font-family:var(--display);font-size:22px;color:var(--sig2);}
+.dyno-stat-l{font-family:var(--mono);font-size:8px;color:var(--t3);letter-spacing:2px;margin-top:3px;}
+.dyno-btn{
+  padding:10px 26px;font-family:var(--display);font-size:11px;
+  font-weight:700;letter-spacing:3px;background:var(--sigf);
+  border:1px solid var(--sig);color:var(--sig2);cursor:pointer;
+  transition:all .15s;margin-bottom:13px;
+}
+.dyno-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+/* ══════════════════════════════════════
+   HOLOGRAPHIC CORNER SYSTEM
+   Layered prismatic HUD frames
+══════════════════════════════════════ */
+
+/* Corner bracket base */
+.holo-frame {
+  position: relative;
+}
+.holo-frame::before,
+.holo-frame::after {
+  content: '';
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  pointer-events: none;
+  z-index: 10;
+}
+/* Top-left */
+.holo-frame::before {
+  top: -1px; left: -1px;
+  border-top: 2px solid var(--sig);
+  border-left: 2px solid var(--sig);
+  filter: drop-shadow(0 0 6px var(--sig)) drop-shadow(0 0 14px rgba(255,107,26,.4));
+}
+/* Bottom-right */
+.holo-frame::after {
+  bottom: -1px; right: -1px;
+  border-bottom: 2px solid var(--sig);
+  border-right: 2px solid var(--sig);
+  filter: drop-shadow(0 0 6px var(--sig)) drop-shadow(0 0 14px rgba(255,107,26,.4));
+}
+
+/* Inner holographic SVG corners — injected via React */
+.holo-corner {
+  position: absolute;
+  pointer-events: none;
+  z-index: 11;
+}
+.holo-corner.tl { top: -2px; left: -2px; }
+.holo-corner.tr { top: -2px; right: -2px; transform: scaleX(-1); }
+.holo-corner.bl { bottom: -2px; left: -2px; transform: scaleY(-1); }
+.holo-corner.br { bottom: -2px; right: -2px; transform: scale(-1,-1); }
+
+/* Prismatic shimmer animation */
+@keyframes holo-shift {
+  0%   { filter: hue-rotate(0deg)   drop-shadow(0 0 4px var(--sig)) drop-shadow(0 0 12px rgba(255,107,26,.5)); }
+  25%  { filter: hue-rotate(30deg)  drop-shadow(0 0 8px #ff9f1a)    drop-shadow(0 0 20px rgba(255,159,26,.4)); }
+  50%  { filter: hue-rotate(-20deg) drop-shadow(0 0 6px #ff5c1a)    drop-shadow(0 0 16px rgba(255,92,26,.5)); }
+  75%  { filter: hue-rotate(15deg)  drop-shadow(0 0 8px #ffcc1a)    drop-shadow(0 0 20px rgba(255,204,26,.4)); }
+  100% { filter: hue-rotate(0deg)   drop-shadow(0 0 4px var(--sig)) drop-shadow(0 0 12px rgba(255,107,26,.5)); }
+}
+@keyframes holo-scan {
+  0%   { opacity: 0.15; transform: translateY(-100%); }
+  100% { opacity: 0;    transform: translateY(100%); }
+}
+@keyframes corner-pulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.6; }
+}
+
+.holo-svg {
+  animation: corner-pulse 3s ease-in-out infinite;
+}
+.holo-svg .pri { animation: holo-shift 4s ease-in-out infinite; }
+.holo-svg .sec { animation: holo-shift 4s ease-in-out infinite 1s; }
+.holo-svg .ter { animation: holo-shift 4s ease-in-out infinite 2s; }
+
+/* Scan line overlay for holographic panels */
+.holo-scan-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+.holo-scan-line {
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,107,26,.08) 20%,
+    rgba(255,180,80,.18) 50%,
+    rgba(255,107,26,.08) 80%,
+    transparent 100%
+  );
+  animation: holo-scan 6s linear infinite;
+}
+
+/* Hero holographic frame — full viewport box */
+.hero-holo-tl,
+.hero-holo-tr,
+.hero-holo-bl,
+.hero-holo-br {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  pointer-events: none;
+  z-index: 5;
+}
+.hero-holo-tl { top: 80px;  left: 24px;  }
+.hero-holo-tr { top: 80px;  right: 24px; transform: scaleX(-1); }
+.hero-holo-bl { bottom: 24px; left: 24px;  transform: scaleY(-1); }
+.hero-holo-br { bottom: 24px; right: 24px; transform: scale(-1,-1); }
+
+/* App shell HUD frame */
+.app-holo-tl,
+.app-holo-tr,
+.app-holo-bl,
+.app-holo-br {
+  position: fixed;
+  width: 80px;
+  height: 80px;
+  pointer-events: none;
+  z-index: 998;
+}
+.app-holo-tl { top: 54px;  left: 0;   }
+.app-holo-tr { top: 54px;  right: 0;  transform: scaleX(-1); }
+.app-holo-bl { bottom: 0;  left: 0;   transform: scaleY(-1); }
+.app-holo-br { bottom: 0;  right: 0;  transform: scale(-1,-1); }
+
+/* Section frames */
+.section-holo {
+  position: relative;
+}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .feat-grid,.rev-grid,.pricing-grid{grid-template-columns:1fr;}
+  .dash6{grid-template-columns:repeat(2,1fr);}
+  .gg{grid-template-columns:repeat(2,1fr);}
+  .act-grid{grid-template-columns:1fr;}
+  .dpf-grid{grid-template-columns:1fr;}
+  .nav-links{display:none;}
+  .stats{gap:24px;}
+  .stat{padding:0 24px;}
+  .dyno-stats{grid-template-columns:repeat(2,1fr);}
+}
+.ad-strip::before{content:'DEMO AD SLOT'}
+.part-ad::before{content:'SAMPLE LISTING · DEMO'}
+#revenue,a[href="#revenue"]{display:none}
+#pricing,a[href="#pricing"]{display:none}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+/* ADHDIKTED OBD-II driver: ELM327-compatible adapters over Web Bluetooth LE or Web Serial.
+   Read-only except Mode 04 (clear codes). Never writes ECU parameters. */
+(function(root){
+var SVC=[0xFFF0,0xFFE0,0x18F0,0xFFE5,'6e400001-b5a3-f393-e0a9-e50e24dcca9e','e7810a71-73ae-499d-8c15-faa9aef0c3f2'];
+var PROTO=['','J1850 PWM','J1850 VPW','ISO 9141-2','KWP 5-baud','KWP fast','CAN 11/500','CAN 29/500','CAN 11/250','CAN 29/250'];
+var P=[
+['0C','RPM',function(a,b){return (a*256+b)/4},'rpm'],
+['0D','SPEED',function(a){return Math.round(a*0.621371)},'mph'],
+['04','LOAD',function(a){return a*100/255},'%'],
+['05','COOLANT',function(a){return (a-40)*1.8+32},'°F'],
+['0F','INTAKE TEMP',function(a){return (a-40)*1.8+32},'°F'],
+['0B','MAP',function(a){return a*0.145038},'psi abs'],
+['33','BARO',function(a){return a*0.145038},'psi'],
+['10','MAF',function(a,b){return (a*256+b)/100},'g/s'],
+['11','THROTTLE',function(a){return a*100/255},'%'],
+['0E','TIMING',function(a){return a/2-64},'°'],
+['06','STFT B1',function(a){return (a-128)*100/128},'%'],
+['07','LTFT B1',function(a){return (a-128)*100/128},'%'],
+['23','RAIL PRESS',function(a,b){return (a*256+b)*10*0.145038},'psi'],
+['2F','FUEL LEVEL',function(a){return a*100/255},'%'],
+['42','VOLTAGE',function(a,b){return (a*256+b)/1000},'V'],
+['5C','OIL TEMP',function(a){return (a-40)*1.8+32},'°F'],
+['46','AMBIENT',function(a){return (a-40)*1.8+32},'°F'],
+['5E','FUEL RATE',function(a,b){return (a*256+b)/20*0.264172},'gal/h']
+];
+var DB={P0300:'Random/multiple cylinder misfire',P0171:'System too lean (bank 1)',P0172:'System too rich (bank 1)',P0174:'System too lean (bank 2)',P0175:'System too rich (bank 2)',P0420:'Catalyst efficiency below threshold (bank 1)',P0430:'Catalyst efficiency below threshold (bank 2)',P0401:'EGR flow insufficient',P0442:'EVAP small leak',P0455:'EVAP large leak',P0456:'EVAP very small leak',P0128:'Coolant below thermostat regulating temp',P0113:'Intake air temp sensor high',P0101:'MAF sensor range/performance',P0102:'MAF circuit low',P0135:'O2 sensor heater circuit (B1S1)',P0141:'O2 sensor heater circuit (B1S2)',P0335:'Crankshaft position sensor circuit',P0340:'Camshaft position sensor circuit',P0507:'Idle speed higher than expected',P0700:'Transmission control system fault',P2002:'Particulate filter efficiency below threshold'};
+for(var i=1;i<=6;i++)DB['P030'+i]='Cylinder '+i+' misfire';
+
+var dec=new TextDecoder(),enc=new TextEncoder();
+var st={veh:null,status:'idle',msg:'',adapter:'',proto:'',vin:'',mil:null,nd:0,values:{},dtcs:[],pending:[],read:false,log:[]};
+var subs=[],T=null,SUP=[],protoNum=0,busy=Promise.resolve(),waiter=null,buf='';
+function snap(){return Object.assign({},st,{values:Object.assign({},st.values),dtcs:st.dtcs.slice(),pending:st.pending.slice(),log:st.log.slice()});}
+function emit(){var s=snap();subs.forEach(function(f){f(s)});}
+function set(o){Object.assign(st,o);emit();}
+function log(m){st.log.push(m);if(st.log.length>60)st.log.shift();}
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms)});}
+
+/* transports */
+async function openBLE(){
+  var dev=await navigator.bluetooth.requestDevice({acceptAllDevices:true,optionalServices:SVC});
+  var srv=await dev.gatt.connect(),svcs=await srv.getPrimaryServices(),rx=null,tx=null;
+  for(var s of svcs){var cs=await s.getCharacteristics();for(var c of cs){var p=c.properties;if(!rx&&(p.notify||p.indicate))rx=c;if(!tx&&(p.write||p.writeWithoutResponse))tx=c;}if(rx&&tx)break;}
+  if(!rx||!tx)throw new Error('No serial characteristic found on this device.');
+  var cb=function(){};
+  await rx.startNotifications();
+  rx.addEventListener('characteristicvaluechanged',function(e){cb(dec.decode(e.target.value))});
+  dev.addEventListener('gattserverdisconnected',function(){if(st.status==='connected')drop('Adapter disconnected.')});
+  return{name:dev.name||'BLE adapter',onData:function(f){cb=f},
+    write:function(t){var b=enc.encode(t);return (tx.properties.writeWithoutResponse&&!tx.properties.write)?tx.writeValueWithoutResponse(b):tx.writeValue(b)},
+    close:function(){dev.gatt.disconnect()}};
+}
+async function openSerial(port,baud){
+  await port.open({baudRate:baud});
+  var w=port.writable.getWriter(),r=port.readable.getReader(),cb=function(){},alive=true;
+  (async function(){try{while(alive){var x=await r.read();if(x.done)break;cb(dec.decode(x.value))}}catch(e){}})();
+  return{name:'USB serial',onData:function(f){cb=f},write:function(t){return w.write(enc.encode(t))},
+    close:async function(){alive=false;try{await r.cancel()}catch(e){}try{w.releaseLock();r.releaseLock();await port.close()}catch(e){}}};
+}
+async function serialT(){
+  var port=await navigator.serial.requestPort(),bauds=[38400,115200];
+  for(var b of bauds){var t=await openSerial(port,b);wire(t);try{await cmd('ATZ',3500);return t}catch(e){await t.close()}}
+  throw new Error('Adapter not responding over USB serial.');
+}
+
+/* ELM327 layer */
+function wire(t){T=t;buf='';t.onData(function(s){buf+=s;if(buf.indexOf('>')>=0&&waiter){var w=waiter,r=buf;waiter=null;buf='';w(r)}})}
+function cmd(c,to){
+  var p=busy.then(function(){return new Promise(function(res,rej){
+    if(!T)return rej(new Error('Not connected'));
+    buf='';
+    var tm=setTimeout(function(){waiter=null;rej(new Error('Timeout: '+c))},to||6000);
+    waiter=function(r){clearTimeout(tm);var L=r.replace(/>/g,'').split(/[\r\n]+/).map(function(x){return x.trim()}).filter(function(x){return x&&x!==c});log(c+' > '+L.join(' | '));res(L)};
+    Promise.resolve(T.write(c+'\r')).catch(function(e){clearTimeout(tm);waiter=null;rej(e)});
+  })});
+  busy=p.catch(function(){});return p;
+}
+function hexLines(L){return L.map(function(l){return l.replace(/^\d+:\s*/,'')}).filter(function(l){return /^([0-9A-F]{2}\s?)+$/i.test(l)&&!/^[0-9A-F]{3}$/i.test(l)})}
+function bytesOf(l){return l.trim().split(/\s+/).map(function(h){return parseInt(h,16)})}
+async function q01(p){
+  var hl=hexLines(await cmd('01'+p));
+  for(var i=0;i<hl.length;i++){var b=bytesOf(hl[i]);if(b[0]===0x41&&b[1]===parseInt(p,16))return b.slice(2)}
+  return null;
+}
+async function scan(){
+  var out=[],base=0,more=true;
+  while(more&&base<=0x60){
+    var b=await q01(base.toString(16).toUpperCase().padStart(2,'0'));
+    if(!b||b.length<4)break;
+    var m=((b[0]<<24)|(b[1]<<16)|(b[2]<<8)|b[3])>>>0;
+    for(var i=0;i<32;i++)if(m&(1<<(31-i)))out.push(base+i+1);
+    more=!!(m&1);base+=0x20;
+  }
+  return out;
+}
+async function refreshMIL(){var b=await q01('01');if(b)set({mil:!!(b[0]&0x80),nd:b[0]&0x7F})}
+async function init(t){
+  wire(t);set({msg:'Initializing adapter…'});
+  var ver=(await cmd('ATZ',4000)).join(' ');
+  await cmd('ATE0');await cmd('ATL0');await cmd('ATH0');await cmd('ATSP0');
+  var r=(await cmd('0100',15000)).join(' ');
+  if(!/41 00/.test(r))throw new Error('Adapter connected, but the vehicle did not answer. Turn ignition ON (engine off is fine) and retry.');
+  var dp=(await cmd('ATDPN')).join('').replace(/^A/,'');protoNum=parseInt(dp,16)||0;
+  SUP=await scan();
+  var name=(ver.match(/ELM\S*\s*v?[\d.]+/)||['ELM327-compatible'])[0];
+  set({status:'connected',msg:'',adapter:(t.name||'')+' · '+name,proto:PROTO[protoNum]||('PROTO '+dp)});
+  try{await refreshMIL()}catch(e){}
+  api.readVIN().catch(function(){});
+}
+async function poll(){
+  var want=P.filter(function(x){return SUP.indexOf(parseInt(x[0],16))>=0}),errs=0;
+  if(!want.length){set({msg:'Vehicle reports no standard live PIDs.'});return}
+  while(st.status==='connected'){
+    for(var x of want){
+      if(st.status!=='connected')return;
+      try{var b=await q01(x[0]);if(b)st.values[x[1]]={v:x[2].apply(null,b),u:x[3],t:Date.now()};else delete st.values[x[1]];errs=0}
+      catch(e){if(st.status==='connected'&&++errs>5){drop('Lost communication with adapter.');return}}
+      var now=Date.now();Object.keys(st.values).forEach(function(k){if(now-st.values[k].t>8000)delete st.values[k]});
+      emit();
+    }
+  }
+}
+function closeT(t){try{Promise.resolve(t.close()).catch(function(){})}catch(e){}}
+function drop(msg){var t=T;T=null;SUP=[];if(t)closeT(t);set({status:msg?'error':'idle',msg:msg||'',values:{}})}
+async function start(getT){
+  if(st.status==='connecting'||st.status==='connected')return;
+  set({status:'connecting',msg:'Connecting…',values:{},dtcs:[],pending:[],read:false,vin:'',veh:null,mil:null,nd:0});
+  var t=null;
+  try{t=await getT();await init(t);poll()}
+  catch(e){if(t)closeT(t);T=null;set({status:'error',msg:e.name==='NotFoundError'?'No device selected.':e.message,values:{}})}
+}
+
+/* diagnostics */
+async function codes(mode){
+  var resp=parseInt(mode,16)+0x40,msgs=[],out=[];
+  hexLines(await cmd(mode,8000)).forEach(function(l){var b=bytesOf(l);if(b[0]===resp)msgs.push(b.slice(1));else if(msgs.length)msgs[msgs.length-1]=msgs[msgs.length-1].concat(b)});
+  msgs.forEach(function(d){
+    if(protoNum>=6)d=d.slice(1);
+    for(var i=0;i+1<d.length;i+=2){var a=d[i],c=d[i+1];if(!a&&!c)continue;
+      var code=('PCBU'[a>>6]+((a>>4)&3)+(a&15).toString(16)+(c>>4).toString(16)+(c&15).toString(16)).toUpperCase();
+      if(out.indexOf(code)<0)out.push(code)}
+  });
+  return out;
+}
+async function lookup(vin){
+  try{
+    var j=((await (await fetch('https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/'+vin+'?format=json')).json()).Results||[{}])[0]||{};
+    var veh={make:j.Make,model:j.Model,year:j.ModelYear,engine:[j.DisplacementL&&(+j.DisplacementL).toFixed(1)+'L',j.EngineCylinders&&j.EngineCylinders+'cyl',j.FuelTypePrimary].filter(Boolean).join(' '),err:(j.ErrorCode&&String(j.ErrorCode)!=='0')?j.ErrorText:'',recalls:null};
+    set({veh:veh});
+    if(veh.make&&veh.model&&veh.year){
+      var rj=await (await fetch('https://api.nhtsa.gov/recalls/recallsByVehicle?make='+encodeURIComponent(veh.make)+'&model='+encodeURIComponent(veh.model)+'&modelYear='+veh.year)).json();
+      veh.recalls=(rj.results||[]).map(function(x){return{id:x.NHTSACampaignNumber,component:x.Component}});set({veh:veh});
+    }
+  }catch(e){set({veh:{err:'Vehicle lookup unavailable (offline or blocked).'}})}
+}
+var api={
+  caps:function(){return{ble:!!(root.navigator&&root.navigator.bluetooth),serial:!!(root.navigator&&root.navigator.serial)}},
+  snapshot:snap,
+  subscribe:function(f){subs.push(f);return function(){subs=subs.filter(function(x){return x!==f})}},
+  connectBLE:function(){return start(openBLE)},
+  connectSerial:function(){return start(serialT)},
+  connectWith:function(getT){return start(getT)},
+  disconnect:function(){drop('')},
+  readCodes:async function(){var d=await codes('03');set({dtcs:d,read:true});await refreshMIL()},
+  readPending:async function(){var d=await codes('07');set({pending:d,read:true})},
+  clearCodes:async function(){var hl=hexLines(await cmd('04',8000));var ok=hl.some(function(l){return bytesOf(l)[0]===0x44});set({dtcs:[],pending:[],read:true});await refreshMIL();if(!ok)throw new Error('Vehicle did not confirm the clear. Try with ignition ON, engine off.')},
+  readVIN:async function(){
+    var bytes=[];
+    hexLines(await cmd('0902',10000)).forEach(function(l){var b=bytesOf(l);if(b[0]===0x49&&b[1]===2)b=b.slice(3);bytes=bytes.concat(b)});
+    var s=bytes.filter(function(x){return x>=32&&x<127}).map(function(x){return String.fromCharCode(x)}).join('');
+    var m=s.match(/[A-HJ-NPR-Z0-9]{17}/);
+    if(!m)throw new Error('VIN not available from this vehicle.');
+    set({vin:m[0]});lookup(m[0]);
+  },
+  describe:function(c){return (root.ADDTC&&root.ADDTC[c])||DB[c]||'Not in the dataset (possibly manufacturer-specific). Tap AI EXPLAIN.'}
+};
+root.ADOBD=api;
+try{fetch('dtc.json').then(function(r){return r.json()}).then(function(d){root.ADDTC=d}).catch(function(){});
+fetch('j1939.json').then(function(r){return r.json()}).then(function(d){root.ADJ=d}).catch(function(){})}catch(e){}
+})(typeof window!=='undefined'?window:globalThis);
+
+</script>
+<script>/* ═══════════════════════════════════════
+   CONSTANTS & CONFIG
+═══════════════════════════════════════ */
+const DOMAIN = "codedkota.com";
+const AI_ENDPOINT = ""; // serverless proxy URL; API key lives server-side only
+const LEAD_ENDPOINT = ""; // Formspree/EmailJS/your endpoint
+function aiFetch(o) {
+  if (!AI_ENDPOINT) return Promise.resolve({
+    json: async () => ({
+      content: [{
+        text: "AI analyst is offline in this demo build. It activates once a server-side proxy is connected."
+      }]
+    })
+  });
+  return fetch(AI_ENDPOINT, o);
+}
+const BRAND = "ADHDIKTED";
+const OP = "ADHDAKOTA";
+const FLEET = [{
+  id: 1,
+  name: "RIG 1",
+  year: "2019",
+  make: "Peterbilt",
+  engine: "Cummins X15",
+  miles: "487,000",
+  status: "online",
+  color: "#ff6b1a"
+}, {
+  id: 2,
+  name: "RIG 2",
+  year: "2017",
+  make: "Kenworth",
+  engine: "Paccar MX-13",
+  miles: "612,000",
+  status: "offline",
+  color: "#7a5800"
+}, {
+  id: 3,
+  name: "RIG 3",
+  year: "2020",
+  make: "Freightliner",
+  engine: "Detroit DD15",
+  miles: "344,000",
+  status: "online",
+  color: "#ff8c47"
+}];
+const TABS = [{id:"OBD",label:"OBD-II ADAPTER"},{id:"LOOK",label:"CODE LOOKUP"},{id:"AI",label:"AI ANALYST"}];
+const PIDS = [{
+  key: "rpm",
+  label: "ENGINE RPM",
+  unit: "RPM",
+  min: 600,
+  max: 2100,
+  warn: 1950,
+  init: 1450
+}, {
+  key: "boost",
+  label: "BOOST",
+  unit: "PSI",
+  min: 0,
+  max: 52,
+  warn: 46,
+  init: 28
+}, {
+  key: "coolant",
+  label: "COOLANT",
+  unit: "°F",
+  min: 160,
+  max: 230,
+  warn: 212,
+  init: 192
+}, {
+  key: "oil",
+  label: "OIL PRESS",
+  unit: "PSI",
+  min: 20,
+  max: 80,
+  warn: 22,
+  init: 55
+}, {
+  key: "fuel",
+  label: "RAIL PRESS",
+  unit: "MPa",
+  min: 0,
+  max: 185,
+  warn: 175,
+  init: 145
+}, {
+  key: "egt",
+  label: "EGT",
+  unit: "°F",
+  min: 200,
+  max: 1450,
+  warn: 1300,
+  init: 980
+}, {
+  key: "intake",
+  label: "INTAKE TEMP",
+  unit: "°F",
+  min: 40,
+  max: 165,
+  warn: 155,
+  init: 110
+}, {
+  key: "def",
+  label: "DEF LEVEL",
+  unit: "%",
+  min: 0,
+  max: 100,
+  warn: 15,
+  init: 62
+}, {
+  key: "trans",
+  label: "TRANS TEMP",
+  unit: "°F",
+  min: 120,
+  max: 245,
+  warn: 225,
+  init: 185
+}, {
+  key: "batt",
+  label: "BATTERY",
+  unit: "V",
+  min: 11,
+  max: 15,
+  warn: 11.8,
+  init: 13.8
+}, {
+  key: "spd",
+  label: "SPEED",
+  unit: "MPH",
+  min: 0,
+  max: 85,
+  warn: 80,
+  init: 62
+}, {
+  key: "load",
+  label: "ENGINE LOAD",
+  unit: "%",
+  min: 0,
+  max: 100,
+  warn: 96,
+  init: 74
+}, {
+  key: "dpf",
+  label: "DPF SOOT",
+  unit: "g/L",
+  min: 0,
+  max: 12,
+  warn: 8,
+  init: 3.2
+}, {
+  key: "torque",
+  label: "TORQUE",
+  unit: "lb-ft",
+  min: 0,
+  max: 1900,
+  warn: 1850,
+  init: 1240
+}, {
+  key: "scr",
+  label: "SCR EFF",
+  unit: "%",
+  min: 70,
+  max: 100,
+  warn: 75,
+  init: 94
+}, {
+  key: "oillife",
+  label: "OIL LIFE",
+  unit: "%",
+  min: 0,
+  max: 100,
+  warn: 10,
+  init: 68
+}];
+const ACTUATORS = [{
+  id: "egr",
+  label: "EGR Valve",
+  desc: "Cycles EGR valve. Watch EGR flow response.",
+  risk: "low",
+  dur: 8
+}, {
+  id: "vgt",
+  label: "VGT Vanes",
+  desc: "Sweeps turbo vanes. Watch boost change.",
+  risk: "low",
+  dur: 10
+}, {
+  id: "c1",
+  label: "Cut Injector 1",
+  desc: "Kills Cyl 1. RPM drop confirms injector.",
+  risk: "med",
+  dur: 6
+}, {
+  id: "c2",
+  label: "Cut Injector 2",
+  desc: "Kills Cyl 2. RPM drop confirms injector.",
+  risk: "med",
+  dur: 6
+}, {
+  id: "c3",
+  label: "Cut Injector 3",
+  desc: "Kills Cyl 3. RPM drop confirms injector.",
+  risk: "med",
+  dur: 6
+}, {
+  id: "c4",
+  label: "Cut Injector 4",
+  desc: "Kills Cyl 4. RPM drop confirms injector.",
+  risk: "med",
+  dur: 6
+}, {
+  id: "c5",
+  label: "Cut Injector 5",
+  desc: "Kills Cyl 5. RPM drop confirms injector.",
+  risk: "med",
+  dur: 6
+}, {
+  id: "c6",
+  label: "Cut Injector 6",
+  desc: "Kills Cyl 6. RPM drop confirms injector.",
+  risk: "med",
+  dur: 6
+}, {
+  id: "fan",
+  label: "Fan Clutch",
+  desc: "Forces fan on. Verify cooling fan engages.",
+  risk: "low",
+  dur: 5
+}, {
+  id: "def2",
+  label: "DEF Doser",
+  desc: "Activates DEF doser. Listen at muffler.",
+  risk: "low",
+  dur: 5
+}, {
+  id: "thr",
+  label: "Throttle Plate",
+  desc: "Cycles throttle. Check smooth travel.",
+  risk: "low",
+  dur: 6
+}, {
+  id: "pump",
+  label: "Lift Pump",
+  desc: "Activates lift pump. Listen for prime.",
+  risk: "low",
+  dur: 4
+}];
+const TUNE_GROUPS = [{
+  name: "ENGINE LIMITS",
+  params: [{
+    id: "rev",
+    label: "Rev Limiter",
+    unit: "RPM",
+    val: 2100,
+    min: 1800,
+    max: 2400,
+    risk: "med"
+  }, {
+    id: "spd2",
+    label: "Speed Limiter",
+    unit: "MPH",
+    val: 68,
+    min: 55,
+    max: 85,
+    risk: "low"
+  }, {
+    id: "idle",
+    label: "Idle Speed",
+    unit: "RPM",
+    val: 650,
+    min: 550,
+    max: 850,
+    risk: "low"
+  }, {
+    id: "shut",
+    label: "Idle Shutdown",
+    unit: "MIN",
+    val: 5,
+    min: 0,
+    max: 30,
+    risk: "low"
+  }]
+}, {
+  name: "FUEL & INJECTION",
+  params: [{
+    id: "fmax",
+    label: "Max Fuel Rate",
+    unit: "mm3",
+    val: 185,
+    min: 150,
+    max: 220,
+    risk: "high"
+  }, {
+    id: "pilot",
+    label: "Pilot Inject Qty",
+    unit: "mm3",
+    val: 2.4,
+    min: 1.0,
+    max: 4.0,
+    risk: "high"
+  }, {
+    id: "itime",
+    label: "Inject Timing",
+    unit: "deg",
+    val: 0.0,
+    min: -3.0,
+    max: 3.0,
+    risk: "high"
+  }, {
+    id: "rail",
+    label: "Rail Pressure",
+    unit: "MPa",
+    val: 160,
+    min: 140,
+    max: 185,
+    risk: "med"
+  }]
+}, {
+  name: "TURBOCHARGER",
+  params: [{
+    id: "btgt",
+    label: "Boost Target",
+    unit: "PSI",
+    val: 38,
+    min: 28,
+    max: 48,
+    risk: "high"
+  }, {
+    id: "vlo",
+    label: "VGT Low RPM",
+    unit: "%",
+    val: 72,
+    min: 55,
+    max: 90,
+    risk: "med"
+  }, {
+    id: "vhi",
+    label: "VGT High RPM",
+    unit: "%",
+    val: 45,
+    min: 30,
+    max: 65,
+    risk: "med"
+  }, {
+    id: "bspk",
+    label: "Boost Spike Limit",
+    unit: "PSI",
+    val: 50,
+    min: 44,
+    max: 58,
+    risk: "med"
+  }]
+}, {
+  name: "TORQUE & POWER",
+  params: [{
+    id: "pktorq",
+    label: "Peak Torque",
+    unit: "lb-ft",
+    val: 1850,
+    min: 1500,
+    max: 2050,
+    risk: "high"
+  }, {
+    id: "hp",
+    label: "Rated HP Override",
+    unit: "HP",
+    val: 450,
+    min: 380,
+    max: 510,
+    risk: "high"
+  }, {
+    id: "ttrq",
+    label: "Trans Torque",
+    unit: "lb-ft",
+    val: 1800,
+    min: 1400,
+    max: 2000,
+    risk: "med"
+  }, {
+    id: "ebrk",
+    label: "Engine Brake Max",
+    unit: "%",
+    val: 100,
+    min: 50,
+    max: 100,
+    risk: "low"
+  }]
+}];
+const INIT_DTCS = [{
+  code: "SPN 3251 FMI 0",
+  desc: "DPF Differential Pressure High",
+  sev: "warn",
+  mod: "AFTR"
+}, {
+  code: "SPN 157 FMI 18",
+  desc: "Injector Rail 1 Pressure Below Normal",
+  sev: "alert",
+  mod: "ECM"
+}, {
+  code: "SPN 641 FMI 7",
+  desc: "VGT Actuator Mechanical Not Responding",
+  sev: "alert",
+  mod: "TURBO"
+}, {
+  code: "SPN 94 FMI 1",
+  desc: "Fuel Delivery Pressure Low",
+  sev: "warn",
+  mod: "FUEL"
+}];
+
+/* ═══════════════════════════════════════
+   ADVERTISING AGENT DATA
+   Replace these with real vendor data / affiliate links
+═══════════════════════════════════════ */
+const AD_VENDORS = [{
+  id: "diesel_pro",
+  name: "DIESEL PRO PARTS",
+  tagline: "OEM & aftermarket — ships same day",
+  url: "https://dieselproparts.com",
+  cta: "SHOP NOW"
+}, {
+  id: "fleetpride",
+  name: "FLEETPRIDE",
+  tagline: "National network — 300+ locations",
+  url: "https://fleetpride.com",
+  cta: "FIND PARTS"
+}, {
+  id: "cummins_st",
+  name: "CUMMINS FILTRATION",
+  tagline: "Genuine Fleetguard filters",
+  url: "https://cumminsfiltration.com",
+  cta: "ORDER"
+}, {
+  id: "interstate",
+  name: "INTERSTATE BATTERIES",
+  tagline: "24/7 fleet accounts available",
+  url: "https://ibt.com",
+  cta: "GET QUOTE"
+}, {
+  id: "truck_svc",
+  name: "TRUCK SERVICE LOCATOR",
+  tagline: "Certified diesel shops near you",
+  url: "https://truckdown.com",
+  cta: "FIND SHOP"
+}];
+const PARTS_CATALOG = {
+  "SPN 3251 FMI 0": [{
+    name: "DPF Filter — Cummins X15",
+    price: "$1,240",
+    vendor: "FleetPride",
+    sku: "CF-X15-DPF",
+    url: "#",
+    affiliate: true
+  }, {
+    name: "DPF Differential Sensor",
+    price: "$86",
+    vendor: "Diesel Pro",
+    sku: "DP-3251-SNSR",
+    url: "#",
+    affiliate: true
+  }],
+  "SPN 157 FMI 18": [{
+    name: "Bosch Injector — Cyl 1",
+    price: "$380",
+    vendor: "Cummins Store",
+    sku: "0445120230",
+    url: "#",
+    affiliate: true
+  }, {
+    name: "Rail Pressure Sensor",
+    price: "$124",
+    vendor: "Diesel Pro",
+    sku: "DP-157-RPS",
+    url: "#",
+    affiliate: true
+  }],
+  "SPN 641 FMI 7": [{
+    name: "VGT Actuator — X15",
+    price: "$695",
+    vendor: "FleetPride",
+    sku: "FP-VGT-641",
+    url: "#",
+    affiliate: true
+  }, {
+    name: "Turbo Rebuild Kit",
+    price: "$280",
+    vendor: "Diesel Pro",
+    sku: "DP-TURBO-RBK",
+    url: "#",
+    affiliate: true
+  }],
+  "SPN 94 FMI 1": [{
+    name: "Fuel Lift Pump — X15",
+    price: "$245",
+    vendor: "FleetPride",
+    sku: "FP-94-LIFT",
+    url: "#",
+    affiliate: true
+  }, {
+    name: "Fuel Filter Kit",
+    price: "$42",
+    vendor: "Cummins Store",
+    sku: "FS1098",
+    url: "#",
+    affiliate: true
+  }]
+};
+
+/* ═══════════════════════════════════════
+   HOLOGRAPHIC CORNER COMPONENT
+═══════════════════════════════════════ */
+
+// Layered prismatic SVG corner bracket
+// size: px dimension of the corner graphic
+// intensity: 'low' | 'med' | 'high'
+function HoloCorner({
+  size = 80,
+  intensity = 'med',
+  className = ''
+}) {
+  const s = size;
+  const thick = intensity === 'high' ? 2.5 : intensity === 'med' ? 2 : 1.5;
+  const spread = intensity === 'high' ? 0.72 : intensity === 'med' ? 0.62 : 0.5;
+
+  // Layer offsets for prismatic depth
+  const layers = [{
+    offset: 0,
+    color: '#ff6b1a',
+    opacity: 1.0,
+    blur: 0
+  }, {
+    offset: 3,
+    color: '#ff9f50',
+    opacity: 0.7,
+    blur: 1
+  }, {
+    offset: 6,
+    color: '#ffcc80',
+    opacity: 0.4,
+    blur: 2
+  }, {
+    offset: 9,
+    color: '#22d3ee',
+    opacity: 0.2,
+    blur: 3
+  }, {
+    offset: 12,
+    color: '#a855f7',
+    opacity: 0.12,
+    blur: 4
+  }];
+  const arm = s * spread; // length of each bracket arm
+
+  return /*#__PURE__*/React.createElement("svg", {
+    className: `holo-svg ${className}`,
+    width: s,
+    height: s,
+    viewBox: `0 0 ${s} ${s}`,
+    style: {
+      position: 'absolute',
+      overflow: 'visible'
+    }
+  }, /*#__PURE__*/React.createElement("defs", null, layers.map((l, i) => /*#__PURE__*/React.createElement("filter", {
+    key: i,
+    id: `hblur${i}${size}`
+  }, /*#__PURE__*/React.createElement("feGaussianBlur", {
+    stdDeviation: l.blur
+  }))), /*#__PURE__*/React.createElement("linearGradient", {
+    id: `hgrad${size}`,
+    x1: "0%",
+    y1: "0%",
+    x2: "100%",
+    y2: "100%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    stopColor: "#ff6b1a",
+    stopOpacity: "1"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "40%",
+    stopColor: "#ff9f50",
+    stopOpacity: "0.9"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "70%",
+    stopColor: "#ffcc80",
+    stopOpacity: "0.6"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    stopColor: "#22d3ee",
+    stopOpacity: "0.3"
+  })), /*#__PURE__*/React.createElement("linearGradient", {
+    id: `htick${size}`,
+    x1: "0%",
+    y1: "0%",
+    x2: "100%",
+    y2: "0%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    stopColor: "#ff6b1a",
+    stopOpacity: "1"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    stopColor: "#ff6b1a",
+    stopOpacity: "0"
+  }))), layers.slice().reverse().map((l, i) => /*#__PURE__*/React.createElement("g", {
+    key: i,
+    opacity: l.opacity,
+    filter: l.blur > 0 ? `url(#hblur${layers.length - 1 - i}${size})` : undefined
+  }, /*#__PURE__*/React.createElement("path", {
+    d: `M ${l.offset} ${arm + l.offset} L ${l.offset} ${l.offset} L ${arm + l.offset} ${l.offset}`,
+    fill: "none",
+    stroke: l.color,
+    strokeWidth: thick + l.offset * 0.15,
+    strokeLinecap: "square"
+  }))), /*#__PURE__*/React.createElement("path", {
+    d: `M 0 ${arm} L 0 0 L ${arm} 0`,
+    fill: "none",
+    stroke: `url(#hgrad${size})`,
+    strokeWidth: thick,
+    strokeLinecap: "square",
+    className: "pri"
+  }), /*#__PURE__*/React.createElement("rect", {
+    x: 0,
+    y: 0,
+    width: thick * 2.5,
+    height: thick * 2.5,
+    fill: "#ff6b1a",
+    opacity: "0.9",
+    style: {
+      filter: `drop-shadow(0 0 4px #ff6b1a)`
+    }
+  }), [0.25, 0.5, 0.75].map((t, i) => {
+    const pos = arm * t;
+    const tickLen = i === 1 ? 10 : 6;
+    return /*#__PURE__*/React.createElement("g", {
+      key: i,
+      opacity: 0.5 + i * 0.1
+    }, /*#__PURE__*/React.createElement("line", {
+      x1: pos,
+      y1: 0,
+      x2: pos,
+      y2: tickLen,
+      stroke: "#ff9f50",
+      strokeWidth: 0.8
+    }), /*#__PURE__*/React.createElement("line", {
+      x1: 0,
+      y1: pos,
+      x2: tickLen,
+      y2: pos,
+      stroke: "#ff9f50",
+      strokeWidth: 0.8
+    }));
+  }), /*#__PURE__*/React.createElement("text", {
+    x: arm * 0.6,
+    y: -5,
+    fill: "#ff6b1a",
+    fontSize: size > 60 ? "7" : "5",
+    fontFamily: "'Space Mono', monospace",
+    opacity: "0.6",
+    letterSpacing: "1"
+  }, "ADHDIKTED"), /*#__PURE__*/React.createElement("path", {
+    d: `M ${thick * 3} ${arm * 0.6} L ${thick * 3} ${thick * 3} L ${arm * 0.6} ${thick * 3}`,
+    fill: "none",
+    stroke: "#22d3ee",
+    strokeWidth: 0.8,
+    opacity: "0.25",
+    className: "sec",
+    strokeLinecap: "square"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: `M ${thick * 6} ${arm * 0.4} L ${thick * 6} ${thick * 6} L ${arm * 0.4} ${thick * 6}`,
+    fill: "none",
+    stroke: "#a855f7",
+    strokeWidth: 0.6,
+    opacity: "0.15",
+    className: "ter",
+    strokeLinecap: "square"
+  }));
+}
+
+// Full four-corner frame wrapper
+function HoloFrame({
+  size = 80,
+  intensity = 'med',
+  style = {},
+  children
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'relative',
+      ...style
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'absolute',
+      top: -2,
+      left: -2,
+      zIndex: 11,
+      pointerEvents: 'none'
+    }
+  }, /*#__PURE__*/React.createElement(HoloCorner, {
+    size: size,
+    intensity: intensity
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'absolute',
+      top: -2,
+      right: -2,
+      zIndex: 11,
+      pointerEvents: 'none',
+      transform: 'scaleX(-1)'
+    }
+  }, /*#__PURE__*/React.createElement(HoloCorner, {
+    size: size,
+    intensity: intensity
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'absolute',
+      bottom: -2,
+      left: -2,
+      zIndex: 11,
+      pointerEvents: 'none',
+      transform: 'scaleY(-1)'
+    }
+  }, /*#__PURE__*/React.createElement(HoloCorner, {
+    size: size,
+    intensity: intensity
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'absolute',
+      bottom: -2,
+      right: -2,
+      zIndex: 11,
+      pointerEvents: 'none',
+      transform: 'scale(-1,-1)'
+    }
+  }, /*#__PURE__*/React.createElement(HoloCorner, {
+    size: size,
+    intensity: intensity
+  })), children);
+}
+
+/* ═══════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════ */
+const R = (a, b) => Math.random() * (b - a) + a;
+const C = (v, a, b) => Math.max(a, Math.min(b, v));
+const P = (v, mn, mx) => Math.round((v - mn) / (mx - mn) * 100);
+const GC = (v, w) => v >= w ? "#ef4444" : v >= w * .88 ? "#eab308" : "#22c55e";
+const FMT = v => v % 1 === 0 ? String(Math.round(v)) : v.toFixed(1);
+function useLive(active) {
+  const init = {};
+  PIDS.forEach(p => {
+    init[p.key] = p.init;
+  });
+  const [d, setD] = React.useState(init);
+  React.useEffect(() => {
+    if (!active) return;
+    const iv = setInterval(() => {
+      setD(p => ({
+        rpm: C(p.rpm + R(-50, 50), 600, 2100),
+        boost: C(p.boost + R(-1.5, 1.5), 0, 52),
+        coolant: C(p.coolant + R(-.8, .8), 160, 230),
+        oil: C(p.oil + R(-.8, .8), 20, 80),
+        fuel: C(p.fuel + R(-3, 3), 0, 185),
+        egt: C(p.egt + R(-20, 20), 200, 1450),
+        intake: C(p.intake + R(-1, 1), 40, 165),
+        def: C(p.def + R(-.02, .01), 0, 100),
+        trans: C(p.trans + R(-.5, .5), 120, 245),
+        batt: C(p.batt + R(-.03, .03), 11, 15),
+        spd: C(p.spd + R(-.5, .5), 0, 85),
+        load: C(p.load + R(-1.5, 1.5), 0, 100),
+        dpf: C(p.dpf + R(-.01, .02), 0, 12),
+        torque: C(p.torque + R(-20, 20), 0, 1900),
+        scr: C(p.scr + R(-.1, .05), 70, 100),
+        oillife: C(p.oillife + R(-.005, 0), 0, 100)
+      }));
+    }, 700);
+    return () => clearInterval(iv);
+  }, [active]);
+  return d;
+}
+
+/* ═══════════════════════════════════════
+   AD AGENT COMPONENTS
+═══════════════════════════════════════ */
+function AdStrip({
+  context
+}) {
+  const vendor = AD_VENDORS[Math.floor(Math.random() * AD_VENDORS.length)];
+  const [v] = React.useState(vendor);
+  function trackClick() {
+    // Revenue event: shop referral click
+    console.log(`[ADHDIKTED AD] click → ${v.id} | context:${context}`);
+    window.open(v.url, '_blank');
+  }
+  return /*#__PURE__*/React.createElement("div", {
+    className: "ad-strip"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "ad-logo"
+  }, v.name.slice(0, 2)), /*#__PURE__*/React.createElement("div", {
+    className: "ad-body"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "ad-name"
+  }, v.name), /*#__PURE__*/React.createElement("div", {
+    className: "ad-sub"
+  }, v.tagline)), /*#__PURE__*/React.createElement("button", {
+    className: "ad-cta",
+    onClick: trackClick
+  }, v.cta));
+}
+function PartsMatch({
+  dtcCode
+}) {
+  const parts = PARTS_CATALOG[dtcCode];
+  if (!parts || !parts.length) return null;
+  const part = parts[0];
+  function trackAffiliate() {
+    // Revenue event: affiliate parts click
+    console.log(`[ADHDIKTED AFFILIATE] click → ${part.sku} | dtc:${dtcCode} | vendor:${part.vendor}`);
+    // In production: resolve to affiliate link + attribution
+    alert(`Affiliate link: ${part.vendor} — ${part.name}\nSKU: ${part.sku}\n\nIn production this routes through your affiliate tracking URL.`);
+  }
+  return /*#__PURE__*/React.createElement("div", {
+    className: "part-ad"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "part-ad-info"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "part-ad-name"
+  }, part.name), /*#__PURE__*/React.createElement("div", {
+    className: "part-ad-price"
+  }, part.price), /*#__PURE__*/React.createElement("div", {
+    className: "part-ad-src"
+  }, "via ", part.vendor, " · SKU ", part.sku)), /*#__PURE__*/React.createElement("button", {
+    className: "part-ad-btn",
+    onClick: trackAffiliate
+  }, "BUY PART →"));
+}
+
+/* ═══════════════════════════════════════
+   LANDING PAGE
+═══════════════════════════════════════ */
+function Landing({
+  onEnter
+}) {
+  const [email, setEmail] = React.useState("");
+  const [biz, setBiz] = React.useState("");
+  const [role, setRole] = React.useState("");
+  const [sent, setSent] = React.useState(false);
+  const [openG, setOpenG] = React.useState({});
+  function submitLead(e) {
+    e.preventDefault();
+    // Revenue event: B2B lead capture
+    const payload = {
+      email,
+      biz,
+      role
+    };
+    if (LEAD_ENDPOINT) {
+      fetch(LEAD_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      }).catch(() => {});
+    } else {
+      window.location.href = "mailto:kotacoded@codedkota.com?subject=" + encodeURIComponent("ADHDIKTED access request") + "&body=" + encodeURIComponent("Business: " + biz + "\nRole: " + role + "\nEmail: " + email);
+    }
+    setSent(true);
+  }
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("nav", {
+    className: "nav"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "nav-brand"
+  }, "ADHDIKTED"), /*#__PURE__*/React.createElement("div", {
+    className: "nav-sub"
+  }, "codedkota.com"), /*#__PURE__*/React.createElement("div", {
+    className: "nav-links"
+  }, /*#__PURE__*/React.createElement("a", {
+    className: "nav-link",
+    href: "#features"
+  }, "FEATURES"), /*#__PURE__*/React.createElement("a", {
+    className: "nav-link",
+    href: "#revenue"
+  }, "REVENUE"), /*#__PURE__*/React.createElement("a", {
+    className: "nav-link",
+    href: "#pricing"
+  }, "PRICING"), /*#__PURE__*/React.createElement("a", {
+    className: "nav-link",
+    href: "#contact"
+  }, "CONTACT"), /*#__PURE__*/React.createElement("button", {
+    className: "nav-cta",
+    onClick: onEnter
+  }, "LAUNCH APP"))), /*#__PURE__*/React.createElement("section", {
+    className: "hero"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "hero-grid"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "hero-glow"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "hero-holo-tl"
+  }, /*#__PURE__*/React.createElement(HoloCorner, {
+    size: 120,
+    intensity: "high"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "hero-holo-tr"
+  }, /*#__PURE__*/React.createElement(HoloCorner, {
+    size: 120,
+    intensity: "high"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "hero-holo-bl"
+  }, /*#__PURE__*/React.createElement(HoloCorner, {
+    size: 120,
+    intensity: "high"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "hero-holo-br"
+  }, /*#__PURE__*/React.createElement(HoloCorner, {
+    size: 120,
+    intensity: "high"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "holo-scan-wrap"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "holo-scan-line"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "hero-eyebrow"
+  }, "PROFESSIONAL DIESEL DIAGNOSTICS"), /*#__PURE__*/React.createElement("h1", {
+    className: "hero-title"
+  }, "ADHDIKTED"), /*#__PURE__*/React.createElement("div", {
+    className: "hero-domain"
+  }, "codedkota.com"), /*#__PURE__*/React.createElement("p", {
+    className: "hero-deck"
+  }, "Enterprise diagnostic intelligence for ", /*#__PURE__*/React.createElement("strong", null, "fleets, shops, and owner-operators."), " ", "Plug in any ELM327 OBD-II adapter for live data, trouble codes, and VIN. Heavy-duty J1939 bridge in development."), /*#__PURE__*/React.createElement("div", {
+    className: "hero-actions"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn-primary",
+    onClick: onEnter
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "btn-shine"
+  }), "LAUNCH PLATFORM"), /*#__PURE__*/React.createElement("a", {
+    className: "btn-ghost",
+    href: "#pricing"
+  }, "SEE PRICING"))), /*#__PURE__*/React.createElement("div", {
+    className: "stats"
+  }, [{"n": "2,100+", "l": "OBD-II CODES"},{"n": "J1939", "l": "SPN / FMI LOOKUP"},{"n": "VIN", "l": "DECODE + RECALLS"},{"n": "BLE", "l": "+ USB ADAPTERS"},{"n": "AI", "l": "EVIDENCE-GATED"}].map(s => /*#__PURE__*/React.createElement("div", {
+    key: s.l,
+    className: "stat"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "stat-n"
+  }, s.n), /*#__PURE__*/React.createElement("div", {
+    className: "stat-l"
+  }, s.l)))), /*#__PURE__*/React.createElement("section", {
+    className: "section",
+    id: "features"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "sh"
+  }, "PLATFORM CAPABILITIES"), /*#__PURE__*/React.createElement("h2", {
+    className: "section-title"
+  }, "Read the vehicle.", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("span", null, "Trust the evidence.")), /*#__PURE__*/React.createElement("div", {
+    className: "feat-grid"
+  }, [{"icon": "⚡", "title": "LIVE OBD-II DATA", "desc": "Standard PIDs read from your adapter: RPM, speed, load, coolant, intake, MAP, MAF, throttle, fuel trims, voltage. A missing reading shows nothing, never a guess.", "tag": "ELM327 · BLE / USB"},{"icon": "🔎", "title": "TROUBLE CODES", "desc": "Stored and pending emissions codes with plain-English meanings from an open 2,100-code dataset. Codes are saved to a file before any clear.", "tag": "MODE 03 / 07"},{"icon": "🪪", "title": "VIN + RECALLS", "desc": "Decodes make, model, year and engine from the VIN and lists recall campaigns issued for that model year.", "tag": "NHTSA"},{"icon": "📚", "title": "CODE LOOKUP", "desc": "Look up any generic OBD-II code or J1939 SPN/FMI pair. No adapter needed.", "tag": "NO ADAPTER NEEDED"},{"icon": "🤖", "title": "EVIDENCE-GATED AI", "desc": "The analyst sees your real readings and codes, must rank hypotheses with confidence, and names the cheapest confirming test before any part.", "tag": "NEEDS SERVER PROXY"},{"icon": "🚛", "title": "HEAVY-DUTY J1939", "desc": "Class 8 data such as DPF, SCR and rail pressure needs a J1939 adapter and the bridge server. In development.", "tag": "COMING"}].map(f => /*#__PURE__*/React.createElement("div", {
+    key: f.title,
+    className: "feat"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "feat-icon"
+  }, f.icon), /*#__PURE__*/React.createElement("div", {
+    className: "feat-title"
+  }, f.title), /*#__PURE__*/React.createElement("p", {
+    className: "feat-desc"
+  }, f.desc), /*#__PURE__*/React.createElement("div", {
+    className: "feat-tag"
+  }, f.tag))))), /*#__PURE__*/React.createElement("div", {
+    className: "revenue",
+    id: "revenue"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "rev-inner"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "sh"
+  }, "MONETIZATION STACK"), /*#__PURE__*/React.createElement("h2", {
+    className: "section-title"
+  }, "Three ways the platform", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("span", null, "pays you.")), /*#__PURE__*/React.createElement("div", {
+    className: "rev-grid"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "rev-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "rev-num"
+  }, "01"), /*#__PURE__*/React.createElement("div", {
+    className: "rev-label"
+  }, "LEAD GENERATION"), /*#__PURE__*/React.createElement("div", {
+    className: "rev-title"
+  }, "SPONSORED SHOPS"), /*#__PURE__*/React.createElement("p", {
+    className: "rev-desc"
+  }, "Every fault code surfaces a sponsored local shop or national vendor. You control the ad inventory. Shops pay per click or per lead."), /*#__PURE__*/React.createElement("div", {
+    className: "rev-est"
+  }, "EST. $0.40–$2.80 per click · CPM or CPA model")), /*#__PURE__*/React.createElement("div", {
+    className: "rev-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "rev-num"
+  }, "02"), /*#__PURE__*/React.createElement("div", {
+    className: "rev-label"
+  }, "AFFILIATE PARTS"), /*#__PURE__*/React.createElement("div", {
+    className: "rev-title"
+  }, "PARTS MATCHING"), /*#__PURE__*/React.createElement("p", {
+    className: "rev-desc"
+  }, "When a fault fires, the exact OEM or aftermarket part surfaces with your affiliate link. FleetPride, Diesel Pro, Cummins — you earn commission on every order."), /*#__PURE__*/React.createElement("div", {
+    className: "rev-est"
+  }, "EST. 3–8% commission · avg order $180–$1,400")), /*#__PURE__*/React.createElement("div", {
+    className: "rev-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "rev-num"
+  }, "03"), /*#__PURE__*/React.createElement("div", {
+    className: "rev-label"
+  }, "B2B SAAS"), /*#__PURE__*/React.createElement("div", {
+    className: "rev-title"
+  }, "FLEET SEATS"), /*#__PURE__*/React.createElement("p", {
+    className: "rev-desc"
+  }, "Fleet managers and independent shops pay monthly for mechanic or admin tier access. Recurring revenue. Scales with your install base."), /*#__PURE__*/React.createElement("div", {
+    className: "rev-est"
+  }, "EST. $49–$149/seat/month · recurring"))))), /*#__PURE__*/React.createElement("section", {
+    style: {
+      background: "var(--void)",
+      borderTop: "1px solid var(--wire)",
+      borderBottom: "1px solid var(--wire)",
+      padding: "100px 32px",
+      position: "relative",
+      overflow: "hidden"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      maxWidth: 1200,
+      margin: "0 auto",
+      position: "relative",
+      zIndex: 2
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "sh"
+  }, "STRATEGIC PARTNERSHIP"), /*#__PURE__*/React.createElement("h2", {
+    className: "section-title"
+  }, "Two operators.", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("span", null, "One platform. Zero distance.")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      margin: "60px 0 48px"
+    }
+  }, /*#__PURE__*/React.createElement(HoloFrame, {
+    size: 60,
+    intensity: "high",
+    style: {
+      background: "var(--deep)",
+      border: "1px solid var(--wire)",
+      padding: "40px 32px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: 32,
+      flexWrap: "wrap"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
+      flex: 1,
+      minWidth: 180
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--mono)",
+      fontSize: 9,
+      letterSpacing: 4,
+      color: "var(--t3)",
+      marginBottom: 12
+    }
+  }, "NORTH TEXAS"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 80,
+      height: 80,
+      margin: "0 auto 16px",
+      border: "2px solid var(--sig)",
+      background: "var(--sigf)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      clipPath: "polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--display)",
+      fontSize: 28,
+      color: "var(--sig)"
+    }
+  }, "DFW")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--display)",
+      fontSize: 20,
+      letterSpacing: 3,
+      color: "var(--t)",
+      marginBottom: 4
+    }
+  }, "ADHDAKOTA"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--mono)",
+      fontSize: 9,
+      color: "var(--sig2)",
+      letterSpacing: 2,
+      marginBottom: 6
+    }
+  }, "PLATFORM ARCHITECT"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--mono)",
+      fontSize: 8,
+      color: "var(--t3)"
+    }
+  }, "Dallas–Fort Worth, TX")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 2,
+      minWidth: 160,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      gap: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: "100%",
+      height: 2,
+      background: "linear-gradient(90deg,var(--sig),var(--cyan),var(--sig))",
+      backgroundSize: "200% 100%",
+      animation: "titleshine 2s linear infinite",
+      position: "relative"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%,-50%)",
+      width: 10,
+      height: 10,
+      background: "var(--cyan)",
+      borderRadius: "50%",
+      boxShadow: "0 0 12px var(--cyan)"
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--mono)",
+      fontSize: 8,
+      letterSpacing: 3,
+      color: "var(--t3)"
+    }
+  }, "codedkota.com"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--mono)",
+      fontSize: 7,
+      letterSpacing: 2,
+      color: "var(--t4)"
+    }
+  }, "~500 MI — BRIDGED"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: "100%",
+      height: 1,
+      background: "var(--wire)",
+      position: "relative",
+      overflow: "hidden"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      width: "30%",
+      height: "100%",
+      background: "linear-gradient(90deg,transparent,var(--sig),transparent)",
+      animation: "titleshine 1.8s linear infinite"
+    }
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
+      flex: 1,
+      minWidth: 180
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--mono)",
+      fontSize: 9,
+      letterSpacing: 4,
+      color: "var(--t3)",
+      marginBottom: 12
+    }
+  }, "RIO GRANDE VALLEY"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 80,
+      height: 80,
+      margin: "0 auto 16px",
+      border: "2px solid var(--cyan)",
+      background: "rgba(34,211,238,.06)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      clipPath: "polygon(12px 0%,100% 0%,calc(100% - 12px) 100%,0% 100%)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--display)",
+      fontSize: 16,
+      color: "var(--cyan)",
+      textAlign: "center",
+      lineHeight: 1.2
+    }
+  }, "MSN", /*#__PURE__*/React.createElement("br", null), "TX")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--display)",
+      fontSize: 20,
+      letterSpacing: 3,
+      color: "var(--t)",
+      marginBottom: 4
+    }
+  }, "ANDREW KELLY"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--mono)",
+      fontSize: 9,
+      color: "var(--cyan)",
+      letterSpacing: 2,
+      marginBottom: 6
+    }
+  }, "NETWORKING & BD PARTNER"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--mono)",
+      fontSize: 8,
+      color: "var(--t3)"
+    }
+  }, "Mission, TX — Rio Grande Valley"))))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "repeat(3,1fr)",
+      gap: 20,
+      marginBottom: 40
+    }
+  }, [{
+    label: "TERRITORY",
+    value: "Rio Grande Valley",
+    sub: "Mission, TX operational base",
+    color: "var(--cyan)"
+  }, {
+    label: "ROLE",
+    value: "Networking & BD",
+    sub: "Partnerships, fleet acquisition, outreach",
+    color: "var(--sig2)"
+  }, {
+    label: "CORRIDOR",
+    value: "DFW ↔ Valley",
+    sub: "Full Texas corridor — activated",
+    color: "var(--ok)"
+  }].map(item => /*#__PURE__*/React.createElement(HoloFrame, {
+    key: item.label,
+    size: 40,
+    intensity: "low",
+    style: {
+      background: "var(--plate)",
+      border: "1px solid var(--wire)",
+      padding: "20px 22px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--mono)",
+      fontSize: 8,
+      letterSpacing: 4,
+      color: "var(--t3)",
+      marginBottom: 8
+    }
+  }, item.label), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--display)",
+      fontSize: 22,
+      color: item.color,
+      marginBottom: 4
+    }
+  }, item.value), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--mono)",
+      fontSize: 9,
+      color: "var(--t2)"
+    }
+  }, item.sub)))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "28px 32px",
+      border: "1px solid rgba(34,211,238,.2)",
+      background: "rgba(34,211,238,.04)",
+      position: "relative"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      top: -2,
+      left: -2
+    }
+  }, /*#__PURE__*/React.createElement(HoloCorner, {
+    size: 40,
+    intensity: "med"
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      top: -2,
+      right: -2,
+      transform: "scaleX(-1)"
+    }
+  }, /*#__PURE__*/React.createElement(HoloCorner, {
+    size: 40,
+    intensity: "med"
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--mono)",
+      fontSize: 9,
+      letterSpacing: 4,
+      color: "var(--cyan)",
+      marginBottom: 12
+    }
+  }, "PARTNERSHIP STATEMENT"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--display)",
+      fontSize: "clamp(18px,3vw,28px)",
+      color: "var(--t)",
+      lineHeight: 1.4,
+      maxWidth: 700
+    }
+  }, "The distance between DFW and the Valley is the only thing standing between ADHDIKTED and its next hundred customers. Andrew Kelly closes that gap."), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 16,
+      fontFamily: "var(--mono)",
+      fontSize: 9,
+      color: "var(--t3)",
+      letterSpacing: 2
+    }
+  }, "— ADHDAKOTA · codedkota.com"))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      inset: 0,
+      zIndex: 1,
+      background: "radial-gradient(ellipse at 50% 50%, rgba(34,211,238,.03) 0%, transparent 65%)",
+      pointerEvents: "none"
+    }
+  })), /*#__PURE__*/React.createElement("section", {
+    className: "section",
+    id: "pricing"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "sh"
+  }, "ACCESS TIERS"), /*#__PURE__*/React.createElement("h2", {
+    className: "section-title"
+  }, "Early access.", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("span", null, "Scale with your fleet.")), /*#__PURE__*/React.createElement("div", {
+    className: "pricing-grid"
+  }, /*#__PURE__*/React.createElement(HoloFrame, {
+    size: 52,
+    intensity: "low"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "price-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "price-tier"
+  }, "TIER 01"), /*#__PURE__*/React.createElement("div", {
+    className: "price-name"
+  }, "MECHANIC"), /*#__PURE__*/React.createElement("div", {
+    className: "price-amount"
+  }, "$49"), /*#__PURE__*/React.createElement("div", {
+    className: "price-period"
+  }, "/seat /month"), /*#__PURE__*/React.createElement("ul", {
+    className: "price-features"
+  }, /*#__PURE__*/React.createElement("li", null, "All 16 live PIDs"), /*#__PURE__*/React.createElement("li", null, "Fault code reader + AI explain"), /*#__PURE__*/React.createElement("li", null, "Actuator tests (read-only results)"), /*#__PURE__*/React.createElement("li", null, "Injector balance view"), /*#__PURE__*/React.createElement("li", null, "Performance dyno"), /*#__PURE__*/React.createElement("li", null, "AI analyst (25 queries/day)")), /*#__PURE__*/React.createElement("button", {
+    className: "price-btn",
+    onClick: () => document.getElementById('contact').scrollIntoView()
+  }, "GET ACCESS"))), /*#__PURE__*/React.createElement(HoloFrame, {
+    size: 52,
+    intensity: "high"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "price-card featured"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "price-tier"
+  }, "TIER 02"), /*#__PURE__*/React.createElement("div", {
+    className: "price-name"
+  }, "ADMIN"), /*#__PURE__*/React.createElement("div", {
+    className: "price-amount"
+  }, "$149"), /*#__PURE__*/React.createElement("div", {
+    className: "price-period"
+  }, "/seat /month"), /*#__PURE__*/React.createElement("ul", {
+    className: "price-features"
+  }, /*#__PURE__*/React.createElement("li", null, "Everything in Mechanic"), /*#__PURE__*/React.createElement("li", null, "ECM tune parameter writes"), /*#__PURE__*/React.createElement("li", null, "DTC clear authority"), /*#__PURE__*/React.createElement("li", null, "Forced DPF regen"), /*#__PURE__*/React.createElement("li", null, "AI analyst (unlimited)"), /*#__PURE__*/React.createElement("li", null, "Fleet seat management")), /*#__PURE__*/React.createElement("button", {
+    className: "price-btn",
+    onClick: () => document.getElementById('contact').scrollIntoView()
+  }, "GET ACCESS"))), /*#__PURE__*/React.createElement(HoloFrame, {
+    size: 52,
+    intensity: "low"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "price-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "price-tier"
+  }, "TIER 03"), /*#__PURE__*/React.createElement("div", {
+    className: "price-name"
+  }, "FLEET"), /*#__PURE__*/React.createElement("div", {
+    className: "price-amount"
+  }, "$399"), /*#__PURE__*/React.createElement("div", {
+    className: "price-period"
+  }, "/month · up to 10 seats"), /*#__PURE__*/React.createElement("ul", {
+    className: "price-features"
+  }, /*#__PURE__*/React.createElement("li", null, "10 mixed mechanic + admin seats"), /*#__PURE__*/React.createElement("li", null, "White-label option available"), /*#__PURE__*/React.createElement("li", null, "Revenue share on ad inventory"), /*#__PURE__*/React.createElement("li", null, "API bridge server included"), /*#__PURE__*/React.createElement("li", null, "Priority support from ADHDAKOTA"), /*#__PURE__*/React.createElement("li", null, "Custom truck fleet profiles")), /*#__PURE__*/React.createElement("button", {
+    className: "price-btn",
+    onClick: () => document.getElementById('contact').scrollIntoView()
+  }, "GET ACCESS"))))), /*#__PURE__*/React.createElement("div", {
+    className: "lead-section",
+    id: "contact"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "lead-inner"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "sh",
+    style: {
+      justifyContent: "center"
+    }
+  }, "GET STARTED"), /*#__PURE__*/React.createElement("h2", {
+    className: "section-title"
+  }, /*#__PURE__*/React.createElement("span", null, "Request access."), /*#__PURE__*/React.createElement("br", null), "We'll get you live in 24 hours."), sent ? /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 40,
+      padding: "28px",
+      border: "1px solid rgba(34,197,94,.4)",
+      background: "rgba(34,197,94,.06)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--display)",
+      fontSize: 24,
+      color: "var(--ok)",
+      letterSpacing: 3,
+      marginBottom: 8
+    }
+  }, "REQUEST RECEIVED"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--mono)",
+      fontSize: 11,
+      color: "var(--t2)",
+      letterSpacing: 2
+    }
+  }, "ADHDAKOTA will contact you within 24 hours at ", email, /*#__PURE__*/React.createElement("br", null), "Built on codedkota.com")) : /*#__PURE__*/React.createElement("form", {
+    className: "lead-form",
+    onSubmit: submitLead
+  }, /*#__PURE__*/React.createElement("input", {
+    className: "lead-input",
+    placeholder: "Business or shop name",
+    value: biz,
+    onChange: e => setBiz(e.target.value),
+    required: true
+  }), /*#__PURE__*/React.createElement("input", {
+    className: "lead-input",
+    type: "email",
+    placeholder: "Your email address",
+    value: email,
+    onChange: e => setEmail(e.target.value),
+    required: true
+  }), /*#__PURE__*/React.createElement("select", {
+    className: "lead-input lead-select",
+    value: role,
+    onChange: e => setRole(e.target.value),
+    required: true
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "Select your role"), /*#__PURE__*/React.createElement("option", {
+    value: "owner-op"
+  }, "Owner-Operator"), /*#__PURE__*/React.createElement("option", {
+    value: "fleet-mgr"
+  }, "Fleet Manager"), /*#__PURE__*/React.createElement("option", {
+    value: "shop-owner"
+  }, "Shop Owner"), /*#__PURE__*/React.createElement("option", {
+    value: "mechanic"
+  }, "Mechanic / Tech")), /*#__PURE__*/React.createElement("button", {
+    type: "submit",
+    className: "lead-btn"
+  }, "REQUEST ACCESS — codedkota.com"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--mono)",
+      fontSize: 9,
+      color: "var(--t3)",
+      lineHeight: 1.7
+    }
+  }, "By submitting you agree to be contacted about ADHDIKTED. Your details are not sold or shared.")))), /*#__PURE__*/React.createElement("footer", {
+    className: "footer"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "footer-brand"
+  }, "ADHDIKTED"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--mono)",
+      fontSize: 8,
+      color: "var(--t3)",
+      letterSpacing: 2,
+      marginTop: 4
+    }
+  }, "codedkota.com")), /*#__PURE__*/React.createElement("div", {
+    className: "footer-links"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "footer-link",
+    onClick: onEnter
+  }, "LAUNCH APP"), /*#__PURE__*/React.createElement("a", {
+    className: "footer-link",
+    href: "#pricing"
+  }, "PRICING"), /*#__PURE__*/React.createElement("a", {
+    className: "footer-link",
+    href: "#contact"
+  }, "CONTACT")), /*#__PURE__*/React.createElement("div", {
+    className: "footer-copy"
+  }, "© 2026 ADHDIKTED · codedkota.com · Reads real vehicle data and can clear codes (resets emissions monitors). Only emissions-related OBD-II modules are scanned. Not a substitute for a qualified technician. Data: fabiovila/OBDIICodes (MIT), NHTSA vPIC and Recalls. Partner links may become affiliate links and will be disclosed.")));
+}
+
+/* ═══════════════════════════════════════
+   APP LOGIN
+═══════════════════════════════════════ */
+function Login({
+  onAuth
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "login-wrap"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "login-glow"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "login-title"
+  }, "ADHDIKTED"), /*#__PURE__*/React.createElement("div", {
+    className: "login-sub"
+  }, "PUBLIC BETA · OBD-II"), /*#__PURE__*/React.createElement("div", {
+    className: "login-boxes"
+  }, /*#__PURE__*/React.createElement(HoloFrame, {
+    size: 48,
+    intensity: "high"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "login-box"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "login-box-title"
+  }, "DEMO ACCESS"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontFamily: "var(--mono)",
+      fontSize: 10,
+      color: "var(--t2)",
+      lineHeight: 1.8,
+      marginBottom: 14
+    }
+  }, "Reads your real vehicle through an OBD-II adapter. Read-only except Clear Codes. Nothing here writes ECU settings."), /*#__PURE__*/React.createElement("button", {
+    className: "login-btn mech",
+    onClick: () => onAuth("mechanic")
+  }, "ENTER DEMO")))), /*#__PURE__*/React.createElement("div", {
+    className: "login-domain"
+  }, "codedkota.com — ADHDIKTED"));
+}
+
+/* ═══════════════════════════════════════
+   THE DIAGNOSTIC APP
+═══════════════════════════════════════ */
+function DiagApp({
+  auth,
+  onLogout
+}) {
+  const [tab, setTab] = React.useState("OBD");
+  const [rig, setRig] = React.useState(0);
+  const [dtcs, setDtcs] = React.useState(INIT_DTCS);
+  const [dtcX, setDtcX] = React.useState({});
+  const [dtcL, setDtcL] = React.useState({});
+  const [acts, setActs] = React.useState({});
+  const [aprg, setAprg] = React.useState({});
+  const [ares, setAres] = React.useState({});
+  const [regen, setRegen] = React.useState(false);
+  const [rlog, setRlog] = React.useState([]);
+  const [tsrch, setTsrch] = React.useState("");
+  const [openG, setOpenG] = React.useState({
+    0: true
+  });
+  const [tvs, setTvs] = React.useState(() => {
+    const m = {};
+    TUNE_GROUPS.forEach(g => g.params.forEach(p => {
+      m[p.id] = p.val;
+    }));
+    return m;
+  });
+  const [aiMs, setAiMs] = React.useState([{
+    role: "assistant",
+    content: "ADHDIKTED AI online. I reason only from evidence: connect an adapter and read codes first. I will say when the evidence is insufficient."
+  }]);
+  const [aiIn, setAiIn] = React.useState("");
+  const [aiLd, setAiLd] = React.useState(false);
+  const [dynoRun, setDynoRun] = React.useState(false);
+  const [dynoPct, setDynoPct] = React.useState(0);
+  const [dynoRes, setDynoRes] = React.useState(null);
+  const truck = FLEET[rig];
+  const live = useLive(truck.status === "online");
+  const isAdmin = auth === "admin";
+  const isPartner = auth === "partner";
+  const isMech = auth === "mechanic" || auth === "admin" || auth === "partner";
+  const aiEnd = React.useRef(null);
+  React.useEffect(() => {
+    if (aiEnd.current) aiEnd.current.scrollIntoView({
+      behavior: "smooth"
+    });
+  }, [aiMs]);
+  async function explainDTC(d, i) {
+    if (dtcX[i]) {
+      setDtcX(p => ({
+        ...p,
+        [i]: null
+      }));
+      return;
+    }
+    setDtcL(p => ({
+      ...p,
+      [i]: true
+    }));
+    try {
+      const res = await aiFetch({
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 400,
+          messages: [{
+            role: "user",
+            content: `Explain for ${truck.engine}: ${d.code} — ${d.desc}. Give: 1) Root cause, 2) How to confirm, 3) Exact fix. Brief and technical. Use shop-floor language.`
+          }]
+        })
+      });
+      const data = await res.json();
+      setDtcX(p => ({
+        ...p,
+        [i]: data.content ? data.content.map(b => b.text || "").join("") : "Error."
+      }));
+    } catch (e) {
+      setDtcX(p => ({
+        ...p,
+        [i]: "Connection error."
+      }));
+    }
+    setDtcL(p => ({
+      ...p,
+      [i]: false
+    }));
+  }
+  async function sendAI(msg) {
+    const text = msg || aiIn.trim();
+    if (!text || aiLd) return;
+    setAiIn("");
+    const userMsg = {
+      role: "user",
+      content: text
+    };
+    setAiMs(p => [...p, userMsg]);
+    setAiLd(true);
+    const history = [...aiMs, userMsg];
+    try {
+      const res = await aiFetch({
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 1000,
+          system: AI_SYSTEM + "\nEVIDENCE: " + JSON.stringify(evidence()),
+          messages: history.map(m => ({
+            role: m.role,
+            content: m.content
+          }))
+        })
+      });
+      const data = await res.json();
+      setAiMs(p => [...p, {
+        role: "assistant",
+        content: data.content ? data.content.map(b => b.text || "").join("") : "No response."
+      }]);
+    } catch (e) {
+      setAiMs(p => [...p, {
+        role: "assistant",
+        content: "Connection error. Check network."
+      }]);
+    }
+    setAiLd(false);
+  }
+  function runAct(a) {
+    if (!isMech || acts[a.id] === "run") return;
+    setActs(p => ({
+      ...p,
+      [a.id]: "run"
+    }));
+    setAprg(p => ({
+      ...p,
+      [a.id]: 0
+    }));
+    setAres(p => ({
+      ...p,
+      [a.id]: ""
+    }));
+    let e = 0;
+    const iv = setInterval(() => {
+      e += 0.2;
+      setAprg(p => ({
+        ...p,
+        [a.id]: Math.min(100, Math.round(e / a.dur * 100))
+      }));
+      if (e >= a.dur) {
+        clearInterval(iv);
+        const pass = Math.random() > 0.2;
+        setActs(p => ({
+          ...p,
+          [a.id]: "done"
+        }));
+        setAres(p => ({
+          ...p,
+          [a.id]: pass ? "PASS — Response nominal" : "FAIL — No response detected"
+        }));
+      }
+    }, 200);
+  }
+  function startRegen() {
+    if (!isAdmin || regen) return;
+    setRegen(true);
+    setRlog([]);
+    const steps = [{
+      t: 500,
+      m: "Initiating forced regeneration...",
+      cls: "inf"
+    }, {
+      t: 1500,
+      m: "Extended diagnostic session: OPEN",
+      cls: "inf"
+    }, {
+      t: 2500,
+      m: "Pre-checks: coolant OK  oil OK  speed OK",
+      cls: "ok"
+    }, {
+      t: 3500,
+      m: "HC dosing valve: ACTIVE",
+      cls: "inf"
+    }, {
+      t: 5000,
+      m: "EGT rising: 680 → 950 → 1100°F",
+      cls: "hot"
+    }, {
+      t: 7000,
+      m: "DPF inlet 1180°F — oxidation active",
+      cls: "hot"
+    }, {
+      t: 12000,
+      m: "Soot burning: 6.0 → 2.8 g/L",
+      cls: "ok"
+    }, {
+      t: 16000,
+      m: "Regen complete — DPF soot: 1.4 g/L",
+      cls: "ok"
+    }, {
+      t: 17000,
+      m: "Dosing valve CLOSED — session CLOSED",
+      cls: "inf"
+    }];
+    steps.forEach((s, idx) => setTimeout(() => {
+      setRlog(p => [...p, {
+        m: s.m,
+        cls: s.cls
+      }]);
+      if (idx === steps.length - 1) setRegen(false);
+    }, s.t));
+  }
+  function runDyno() {
+    if (!isMech || dynoRun) return;
+    setDynoRun(true);
+    setDynoPct(0);
+    setDynoRes(null);
+    let e = 0;
+    const iv = setInterval(() => {
+      e++;
+      setDynoPct(e);
+      if (e >= 100) {
+        clearInterval(iv);
+        setDynoRun(false);
+        setDynoRes({
+          hp: Math.round(live.torque * Math.max(live.rpm, 600) / 5252),
+          torq: Math.round(live.torque),
+          boost: parseFloat(live.boost.toFixed(1)),
+          egt: Math.round(live.egt)
+        });
+      }
+    }, 60);
+  }
+  const injData = [1, 2, 3, 4, 5, 6].map(n => {
+    const t = parseFloat(((Math.random() - .5) * 1.8 + 2.4).toFixed(2));
+    return {
+      cyl: n,
+      trim: t,
+      bad: Math.abs(t - 2.4) > 0.7
+    };
+  });
+  const filtTune = TUNE_GROUPS.map(g => ({
+    ...g,
+    params: g.params.filter(p => !tsrch || p.label.toLowerCase().includes(tsrch.toLowerCase()))
+  })).filter(g => g.params.length > 0);
+  function renderContent() {
+    if (tab === "OBD") return React.createElement("div", null, React.createElement(VehicleCard, null), React.createElement(ObdPanel, null)); if (tab === "LOOK") return React.createElement(LookupPanel, null);
+    if (tab === "DASH") {
+      const items = [{
+        k: "rpm",
+        l: "ENGINE RPM",
+        fmt: v => Math.round(v),
+        pid: PIDS[0]
+      }, {
+        k: "boost",
+        l: "BOOST",
+        fmt: v => v.toFixed(1),
+        pid: PIDS[1]
+      }, {
+        k: "spd",
+        l: "SPEED",
+        fmt: v => Math.round(v),
+        pid: PIDS[10]
+      }, {
+        k: "load",
+        l: "ENGINE LOAD",
+        fmt: v => Math.round(v) + "%",
+        pid: PIDS[11]
+      }, {
+        k: "coolant",
+        l: "COOLANT",
+        fmt: v => Math.round(v) + "°F",
+        pid: PIDS[2]
+      }, {
+        k: "egt",
+        l: "EGT",
+        fmt: v => Math.round(v) + "°F",
+        pid: PIDS[5]
+      }];
+      return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+        className: "sim-notice"
+      }, "SIMULATION MODE — All data is simulated. Connect NEXIQ bridge for live truck data."), /*#__PURE__*/React.createElement(AdStrip, {
+        context: "dashboard"
+      }), /*#__PURE__*/React.createElement("div", {
+        className: "row-flex"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "blk-sh",
+        style: {
+          margin: 0
+        }
+      }, "DASHBOARD — ", truck.engine), /*#__PURE__*/React.createElement("div", {
+        style: {
+          display: "flex",
+          gap: 8
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "chip " + (truck.status === "online" ? "chip-ok" : "chip-alert")
+      }, truck.status.toUpperCase()), /*#__PURE__*/React.createElement("div", {
+        className: "chip chip-sig"
+      }, truck.miles, " MI"))), /*#__PURE__*/React.createElement("div", {
+        className: "dash6"
+      }, items.map(item => {
+        const v = live[item.k],
+          c = GC(v, item.pid.warn),
+          pc = P(v, item.pid.min, item.pid.max);
+        return /*#__PURE__*/React.createElement("div", {
+          key: item.k,
+          className: "dc" + (v >= item.pid.warn ? " hot" : "")
+        }, /*#__PURE__*/React.createElement("div", {
+          className: "dc-lbl"
+        }, item.l), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+          className: "dc-val",
+          style: {
+            color: c
+          }
+        }, item.fmt(v)), /*#__PURE__*/React.createElement("span", {
+          className: "dc-unit"
+        }, item.pid.unit)), /*#__PURE__*/React.createElement("div", {
+          className: "dc-bar"
+        }, /*#__PURE__*/React.createElement("div", {
+          className: "dc-fill",
+          style: {
+            width: pc + "%",
+            background: c
+          }
+        })));
+      })), /*#__PURE__*/React.createElement("div", {
+        className: "blk-sh"
+      }, "ACTIVE FAULTS"), dtcs.length === 0 ? /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontFamily: "var(--mono)",
+          fontSize: 10,
+          color: "var(--ok)",
+          padding: "14px 0",
+          letterSpacing: 3
+        }
+      }, "ALL CLEAR — NO ACTIVE FAULTS") : /*#__PURE__*/React.createElement("div", {
+        className: "dtc-list"
+      }, dtcs.slice(0, 3).map((d, i) => /*#__PURE__*/React.createElement("div", {
+        key: i,
+        className: "dtc-row " + d.sev
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "dtc-code"
+      }, d.code), /*#__PURE__*/React.createElement("div", {
+        className: "dtc-desc"
+      }, d.desc), /*#__PURE__*/React.createElement("div", {
+        className: "dtc-mod"
+      }, d.mod)))));
+    }
+    if (tab === "LIVE") return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      className: "sim-notice"
+    }, "SIMULATION MODE — Simulated Cummins X15 data stream."), /*#__PURE__*/React.createElement(AdStrip, {
+      context: "live-data"
+    }), /*#__PURE__*/React.createElement("div", {
+      className: "blk-sh"
+    }, "LIVE PID STREAM — ", truck.engine), /*#__PURE__*/React.createElement("div", {
+      className: "gg"
+    }, PIDS.map(p => {
+      const v = live[p.key],
+        pc = P(v, p.min, p.max),
+        c = GC(v, p.warn);
+      return /*#__PURE__*/React.createElement("div", {
+        key: p.key,
+        className: "gauge" + (v >= p.warn ? " hot" : "")
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "g-lbl"
+      }, p.label), /*#__PURE__*/React.createElement("div", {
+        className: "g-val",
+        style: {
+          color: c
+        }
+      }, FMT(v), /*#__PURE__*/React.createElement("span", {
+        className: "g-unit"
+      }, p.unit)), /*#__PURE__*/React.createElement("div", {
+        className: "g-bar"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "g-fill",
+        style: {
+          width: pc + "%",
+          background: c
+        }
+      })), /*#__PURE__*/React.createElement("div", {
+        className: "g-range"
+      }, /*#__PURE__*/React.createElement("span", null, p.min), /*#__PURE__*/React.createElement("span", null, p.max)));
+    })));
+    if (tab === "DTC") return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      className: "sim-notice"
+    }, "FAULT CODES — AI Explain is live. Parts match embedded on each code."), /*#__PURE__*/React.createElement("div", {
+      className: "row-flex"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "blk-sh",
+      style: {
+        margin: 0
+      }
+    }, "FAULT CODES (", dtcs.length, ")"), /*#__PURE__*/React.createElement("button", {
+      className: "chip " + (isAdmin ? "chip-alert" : "chip-warn"),
+      style: {
+        cursor: isAdmin ? "pointer" : "not-allowed"
+      },
+      onClick: () => isAdmin && setDtcs([])
+    }, isAdmin ? "CLEAR ALL" : "ADMIN ONLY")), dtcs.length === 0 ? /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "var(--mono)",
+        fontSize: 10,
+        color: "var(--ok)",
+        padding: "28px 0",
+        letterSpacing: 3
+      }
+    }, "NO ACTIVE FAULT CODES") : /*#__PURE__*/React.createElement("div", {
+      className: "dtc-list"
+    }, dtcs.map((d, i) => /*#__PURE__*/React.createElement("div", {
+      key: i
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "dtc-row " + d.sev
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "dtc-code"
+    }, d.code), /*#__PURE__*/React.createElement("div", {
+      className: "dtc-desc"
+    }, d.desc), /*#__PURE__*/React.createElement("div", {
+      className: "dtc-mod"
+    }, d.mod), /*#__PURE__*/React.createElement("button", {
+      className: "dtc-ai-btn",
+      disabled: dtcL[i],
+      onClick: () => explainDTC(d, i)
+    }, dtcL[i] ? "..." : dtcX[i] ? "HIDE" : "AI EXPLAIN"), /*#__PURE__*/React.createElement("button", {
+      className: "dtc-clr-btn",
+      disabled: !isAdmin,
+      onClick: () => setDtcs(p => p.filter((_, j) => j !== i))
+    }, "CLR")), /*#__PURE__*/React.createElement(PartsMatch, {
+      dtcCode: d.code
+    }), dtcX[i] && /*#__PURE__*/React.createElement("div", {
+      className: "dtc-explain"
+    }, dtcX[i])))), /*#__PURE__*/React.createElement("div", {
+      style: {
+        marginTop: 20
+      }
+    }, /*#__PURE__*/React.createElement(AdStrip, {
+      context: "fault-codes"
+    })));
+    if (tab === "ACT") return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      className: "sim-notice"
+    }, "SIMULATION MODE — Safe to run all actuator tests."), /*#__PURE__*/React.createElement(AdStrip, {
+      context: "actuators"
+    }), /*#__PURE__*/React.createElement("div", {
+      className: "row-flex"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "blk-sh",
+      style: {
+        margin: 0
+      }
+    }, "ACTUATOR TESTS"), /*#__PURE__*/React.createElement("div", {
+      className: "chip " + (isMech ? "chip-ok" : "chip-alert")
+    }, isMech ? "ENABLED" : "LOGIN REQUIRED")), /*#__PURE__*/React.createElement("div", {
+      className: "act-grid"
+    }, ACTUATORS.map(a => {
+      const st = acts[a.id] || "idle",
+        pg = aprg[a.id] || 0,
+        rs = ares[a.id] || "";
+      return /*#__PURE__*/React.createElement("div", {
+        key: a.id,
+        className: "act-card" + (st === "run" ? " run" : "")
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "act-name"
+      }, a.label), /*#__PURE__*/React.createElement("div", {
+        className: "act-desc"
+      }, a.desc), /*#__PURE__*/React.createElement("div", {
+        className: "act-row"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: a.risk === "low" ? "risk-low" : "risk-med"
+      }, a.risk.toUpperCase()), /*#__PURE__*/React.createElement("button", {
+        className: "act-btn " + (st === "run" ? "act-going" : "act-idle"),
+        disabled: !isMech || st === "run",
+        onClick: () => runAct(a)
+      }, st === "run" ? "RUNNING" : st === "done" ? "RE-RUN" : "RUN")), st === "run" && /*#__PURE__*/React.createElement("div", {
+        className: "act-pbar"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "act-pfill",
+        style: {
+          width: pg + "%"
+        }
+      })), rs && /*#__PURE__*/React.createElement("div", {
+        className: "act-result " + (rs.startsWith("PASS") ? "pass" : "fail")
+      }, rs));
+    })));
+    if (tab === "INJ") return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      className: "sim-notice"
+    }, "SIMULATION MODE — Injector trims are randomized sample data."), /*#__PURE__*/React.createElement("div", {
+      className: "blk-sh"
+    }, "INJECTOR BALANCE — ", truck.engine), /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "grid",
+        gridTemplateColumns: "repeat(6,1fr)",
+        gap: 9,
+        marginBottom: 16
+      }
+    }, injData.map(inj => /*#__PURE__*/React.createElement("div", {
+      key: inj.cyl,
+      style: {
+        background: "var(--deep)",
+        border: `1px solid ${inj.bad ? "var(--alert)" : "var(--rim)"}`,
+        padding: "12px 8px",
+        textAlign: "center"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "var(--mono)",
+        fontSize: 9,
+        color: "var(--t3)",
+        letterSpacing: 2,
+        marginBottom: 7
+      }
+    }, "CYL ", inj.cyl), /*#__PURE__*/React.createElement("div", {
+      style: {
+        height: 72,
+        display: "flex",
+        alignItems: "flex-end",
+        justifyContent: "center",
+        marginBottom: 5
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: 20,
+        height: Math.round(inj.trim / 4 * 72),
+        background: inj.bad ? "linear-gradient(0deg,var(--alert),#ff9090)" : "linear-gradient(0deg,var(--sig),var(--sig2))",
+        borderRadius: "2px 2px 0 0",
+        transition: "height .5s"
+      }
+    })), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "var(--display)",
+        fontSize: 12,
+        fontWeight: 700,
+        color: inj.bad ? "var(--alert)" : "var(--sig2)",
+        marginBottom: 2
+      }
+    }, inj.trim), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "var(--mono)",
+        fontSize: 8,
+        color: "var(--t3)"
+      }
+    }, "mm3/st"), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "var(--mono)",
+        fontSize: 8,
+        marginTop: 5,
+        padding: "2px 5px",
+        border: `1px solid ${inj.bad ? "var(--alert)" : "var(--ok)"}`,
+        color: inj.bad ? "var(--alert)" : "var(--ok)"
+      }
+    }, inj.bad ? "SUSPECT" : "OK")))), injData.some(i => i.bad) && /*#__PURE__*/React.createElement("div", {
+      style: {
+        marginBottom: 16
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "blk-sh"
+    }, "PARTS MATCH — SUSPECT INJECTORS"), injData.filter(i => i.bad).map(inj => /*#__PURE__*/React.createElement("div", {
+      key: inj.cyl,
+      className: "part-ad",
+      style: {
+        marginBottom: 8
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "part-ad-info"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "part-ad-name"
+    }, "Remanufactured Injector — Cyl ", inj.cyl), /*#__PURE__*/React.createElement("div", {
+      className: "part-ad-price"
+    }, "$380"), /*#__PURE__*/React.createElement("div", {
+      className: "part-ad-src"
+    }, "via FleetPride · SKU FP-INJ-X15-CYL", inj.cyl)), /*#__PURE__*/React.createElement("button", {
+      className: "part-ad-btn"
+    }, "BUY PART →")))), /*#__PURE__*/React.createElement(AdStrip, {
+      context: "injectors"
+    }));
+    if (tab === "REGEN") {
+      const dpfItems = [{
+        l: "DPF SOOT LOAD",
+        v: live.dpf.toFixed(1),
+        u: "g/L",
+        pc: P(live.dpf, 0, 12),
+        w: 8,
+        note: "Regen threshold 8 g/L"
+      }, {
+        l: "SCR EFFICIENCY",
+        v: live.scr.toFixed(1),
+        u: "%",
+        pc: live.scr,
+        w: 75,
+        note: "Below 75% triggers fault"
+      }, {
+        l: "DEF LEVEL",
+        v: live.def.toFixed(1),
+        u: "%",
+        pc: live.def,
+        w: 15,
+        note: "Low warning at 15%"
+      }, {
+        l: "EGT OUTLET",
+        v: String(Math.round(live.egt)),
+        u: "°F",
+        pc: P(live.egt, 200, 1450),
+        w: 1300,
+        note: "Regen temp 950–1150°F"
+      }];
+      return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+        className: "sim-notice"
+      }, "SIMULATION MODE — Regen sequence safe to run."), /*#__PURE__*/React.createElement("div", {
+        className: "blk-sh"
+      }, "AFTERTREATMENT STATUS"), /*#__PURE__*/React.createElement("div", {
+        className: "dpf-grid"
+      }, dpfItems.map((d, i) => {
+        const hot = parseFloat(d.v) >= d.w,
+          c = hot ? "var(--alert)" : "var(--ok)";
+        return /*#__PURE__*/React.createElement("div", {
+          key: i,
+          className: "dpf-c"
+        }, /*#__PURE__*/React.createElement("div", {
+          className: "dpf-lbl"
+        }, d.l), /*#__PURE__*/React.createElement("div", {
+          className: "dpf-val",
+          style: {
+            color: c
+          }
+        }, d.v, " ", /*#__PURE__*/React.createElement("span", {
+          style: {
+            fontSize: 12,
+            color: "var(--t2)"
+          }
+        }, d.u)), /*#__PURE__*/React.createElement("div", {
+          className: "dpf-bar"
+        }, /*#__PURE__*/React.createElement("div", {
+          className: "dpf-fill",
+          style: {
+            width: d.pc + "%",
+            background: c
+          }
+        })), /*#__PURE__*/React.createElement("div", {
+          className: "dpf-note"
+        }, d.note));
+      })), regen ? /*#__PURE__*/React.createElement("div", {
+        className: "regen-running"
+      }, "FORCED REGEN IN PROGRESS") : /*#__PURE__*/React.createElement("button", {
+        className: "regen-btn",
+        disabled: !isAdmin || regen,
+        onClick: startRegen
+      }, isAdmin ? "INITIATE FORCED REGEN" : "ADMIN REQUIRED"), rlog.length > 0 && /*#__PURE__*/React.createElement("div", {
+        className: "regen-log"
+      }, rlog.map((l, i) => /*#__PURE__*/React.createElement("div", {
+        key: i,
+        className: l.cls
+      }, "> " + l.m))), /*#__PURE__*/React.createElement("div", {
+        style: {
+          marginTop: 16
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "blk-sh"
+      }, "DPF PARTS"), /*#__PURE__*/React.createElement(PartsMatch, {
+        dtcCode: "SPN 3251 FMI 0"
+      }), /*#__PURE__*/React.createElement(AdStrip, {
+        context: "regen"
+      })));
+    }
+    if (tab === "DYNO") return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      className: "sim-notice"
+    }, "SIMULATION MODE — Dyno calculated from live sensor data."), /*#__PURE__*/React.createElement("div", {
+      className: "blk-sh"
+    }, "PERFORMANCE DYNO — ", truck.engine), /*#__PURE__*/React.createElement("button", {
+      className: "dyno-btn",
+      disabled: !isMech || dynoRun,
+      onClick: runDyno
+    }, dynoRun ? "RUNNING DYNO PULL..." : "RUN DYNO PULL"), dynoRun && /*#__PURE__*/React.createElement("div", {
+      style: {
+        marginBottom: 14
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "var(--mono)",
+        fontSize: 9,
+        color: "var(--sig)",
+        letterSpacing: 2,
+        marginBottom: 6
+      }
+    }, "SWEEP IN PROGRESS — ", dynoPct, "%"), /*#__PURE__*/React.createElement("div", {
+      style: {
+        height: 4,
+        background: "var(--rim)",
+        overflow: "hidden"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        height: "100%",
+        width: dynoPct + "%",
+        background: "linear-gradient(90deg,var(--sig),var(--sig2))",
+        transition: "width .1s"
+      }
+    }))), /*#__PURE__*/React.createElement("div", {
+      className: "dyno-wrap"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "dyno-canvas"
+    }, /*#__PURE__*/React.createElement("svg", {
+      width: "100%",
+      height: "100%",
+      viewBox: "0 0 100 100",
+      preserveAspectRatio: "none"
+    }, /*#__PURE__*/React.createElement("line", {
+      x1: "0",
+      y1: "25",
+      x2: "100",
+      y2: "25",
+      stroke: "var(--rim)",
+      strokeWidth: ".5"
+    }), /*#__PURE__*/React.createElement("line", {
+      x1: "0",
+      y1: "50",
+      x2: "100",
+      y2: "50",
+      stroke: "var(--rim)",
+      strokeWidth: ".5"
+    }), /*#__PURE__*/React.createElement("line", {
+      x1: "0",
+      y1: "75",
+      x2: "100",
+      y2: "75",
+      stroke: "var(--rim)",
+      strokeWidth: ".5"
+    }), /*#__PURE__*/React.createElement("polyline", {
+      points: "0,90 10,75 20,60 30,45 40,35 50,28 60,25 70,24 80,26 90,32 100,45",
+      fill: "none",
+      stroke: "var(--sig)",
+      strokeWidth: ".8"
+    }), /*#__PURE__*/React.createElement("polyline", {
+      points: "0,95 10,88 20,78 30,65 40,52 50,42 60,36 70,33 80,34 90,38 100,48",
+      fill: "none",
+      stroke: "var(--cyan)",
+      strokeWidth: ".8"
+    })), /*#__PURE__*/React.createElement("div", {
+      style: {
+        position: "absolute",
+        top: 8,
+        left: 12,
+        fontFamily: "var(--mono)",
+        fontSize: 8,
+        color: "var(--sig2)"
+      }
+    }, "HP"), /*#__PURE__*/React.createElement("div", {
+      style: {
+        position: "absolute",
+        top: 8,
+        left: 30,
+        fontFamily: "var(--mono)",
+        fontSize: 8,
+        color: "var(--cyan)"
+      }
+    }, "TORQUE")), dynoRes ? /*#__PURE__*/React.createElement("div", {
+      className: "dyno-stats"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "dyno-stat"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "dyno-stat-n"
+    }, dynoRes.hp), /*#__PURE__*/React.createElement("div", {
+      className: "dyno-stat-l"
+    }, "PEAK HP")), /*#__PURE__*/React.createElement("div", {
+      className: "dyno-stat"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "dyno-stat-n"
+    }, dynoRes.torq), /*#__PURE__*/React.createElement("div", {
+      className: "dyno-stat-l"
+    }, "PEAK TORQUE")), /*#__PURE__*/React.createElement("div", {
+      className: "dyno-stat"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "dyno-stat-n"
+    }, dynoRes.boost), /*#__PURE__*/React.createElement("div", {
+      className: "dyno-stat-l"
+    }, "PEAK BOOST")), /*#__PURE__*/React.createElement("div", {
+      className: "dyno-stat"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "dyno-stat-n"
+    }, dynoRes.egt), /*#__PURE__*/React.createElement("div", {
+      className: "dyno-stat-l"
+    }, "PEAK EGT °F"))) : /*#__PURE__*/React.createElement("div", {
+      style: {
+        textAlign: "center",
+        padding: "20px 0",
+        fontFamily: "var(--mono)",
+        fontSize: 10,
+        color: "var(--t3)",
+        letterSpacing: 2
+      }
+    }, "HIT RUN DYNO PULL TO SEE RESULTS")), /*#__PURE__*/React.createElement(AdStrip, {
+      context: "dyno"
+    }));
+    if (tab === "TUNE") return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      className: "sim-notice"
+    }, "SIMULATION MODE — Parameter changes do NOT affect any real truck."), /*#__PURE__*/React.createElement("div", {
+      className: "row-flex"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "blk-sh",
+      style: {
+        margin: 0
+      }
+    }, "TUNE EDITOR — ", truck.engine), /*#__PURE__*/React.createElement("div", {
+      className: "chip " + (isAdmin ? "chip-ok" : "chip-warn")
+    }, isAdmin ? "WRITE ENABLED" : "READ ONLY")), !isAdmin && /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "var(--mono)",
+        fontSize: 10,
+        color: "var(--sig)",
+        padding: "8px 12px",
+        border: "1px solid var(--sigborder)",
+        background: "var(--sigf)",
+        marginBottom: 13,
+        letterSpacing: 1
+      }
+    }, "ADMIN LOGIN REQUIRED TO MODIFY PARAMETERS"), /*#__PURE__*/React.createElement("input", {
+      className: "tsearch",
+      placeholder: "Search parameters...",
+      value: tsrch,
+      onChange: e => setTsrch(e.target.value)
+    }), filtTune.map((g, gi) => /*#__PURE__*/React.createElement("div", {
+      key: gi,
+      className: "tgrp"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "tghdr",
+      onClick: () => setOpenG(p => ({
+        ...p,
+        [gi]: !p[gi]
+      }))
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "tg-name"
+    }, g.name), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "var(--mono)",
+        fontSize: 10,
+        color: "var(--t3)"
+      }
+    }, openG[gi] ? "▲" : "▼")), openG[gi] && /*#__PURE__*/React.createElement("div", {
+      className: "tg-body"
+    }, g.params.map(p => /*#__PURE__*/React.createElement("div", {
+      key: p.id,
+      className: "p-row"
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      className: "p-lbl"
+    }, p.label), /*#__PURE__*/React.createElement("div", {
+      className: "p-sub"
+    }, p.min, "–", p.max, " ", p.unit)), /*#__PURE__*/React.createElement("div", {
+      className: p.risk === "low" ? "risk-low2" : p.risk === "med" ? "risk-med2" : "risk-high"
+    }, p.risk.toUpperCase()), /*#__PURE__*/React.createElement("input", {
+      className: "p-inp",
+      type: "number",
+      value: tvs[p.id],
+      min: p.min,
+      max: p.max,
+      disabled: !isAdmin,
+      onChange: e => {
+        const v = parseFloat(e.target.value) || 0;
+        setTvs(pv => ({
+          ...pv,
+          [p.id]: v
+        }));
+      }
+    }), /*#__PURE__*/React.createElement("div", {
+      className: "p-unit"
+    }, p.unit)))))), /*#__PURE__*/React.createElement("button", {
+      className: "write-btn",
+      disabled: !isAdmin,
+      onClick: () => alert("Connect ADHDIKTED bridge server and NEXIQ adapter to write to real ECM.\n\nSee codedkota.com for setup instructions.")
+    }, isAdmin ? "WRITE TO ECM — CONNECT BRIDGE FIRST" : "ADMIN REQUIRED TO WRITE"));
+    if (tab === "AI") return /*#__PURE__*/React.createElement("div", {
+      className: "ai-shell"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "sim-notice"
+    }, "AI ANALYST — answers only from your evidence. Needs the server proxy to be connected."), /*#__PURE__*/React.createElement("div", {
+      className: "blk-sh"
+    }, "ADHDIKTED AI ANALYST"), /*#__PURE__*/React.createElement("div", {
+      className: "q-btns"
+    }, ["Explain my codes","What should I check first?","Is it safe to keep driving?","What evidence is missing?"].map(q => /*#__PURE__*/React.createElement("button", {
+      key: q,
+      className: "q-btn",
+      onClick: () => sendAI(q)
+    }, q))), /*#__PURE__*/React.createElement("div", {
+      className: "ai-msgs"
+    }, aiMs.map((m, i) => /*#__PURE__*/React.createElement("div", {
+      key: i,
+      className: "ai-msg" + (m.role === "user" ? " u" : "")
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "ai-av"
+    }, m.role === "assistant" ? "AI" : "ME"), /*#__PURE__*/React.createElement("div", {
+      className: "ai-bub",
+      style: {
+        whiteSpace: "pre-wrap"
+      }
+    }, m.content))), aiLd && /*#__PURE__*/React.createElement("div", {
+      className: "ai-msg"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "ai-av"
+    }, "AI"), /*#__PURE__*/React.createElement("div", {
+      className: "ai-bub"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "typing-dots"
+    }, /*#__PURE__*/React.createElement("span", null), /*#__PURE__*/React.createElement("span", null), /*#__PURE__*/React.createElement("span", null)))), /*#__PURE__*/React.createElement("div", {
+      ref: aiEnd
+    })), /*#__PURE__*/React.createElement("div", {
+      style: {
+        marginBottom: 10
+      }
+    }, null), /*#__PURE__*/React.createElement("div", {
+      className: "ai-row"
+    }, /*#__PURE__*/React.createElement("input", {
+      className: "ai-in",
+      placeholder: "Ask your engine anything...",
+      value: aiIn,
+      onChange: e => setAiIn(e.target.value),
+      onKeyDown: e => e.key === "Enter" && sendAI()
+    }), /*#__PURE__*/React.createElement("button", {
+      className: "ai-go",
+      disabled: aiLd || !aiIn.trim(),
+      onClick: () => sendAI()
+    }, "SEND")));
+    if (tab === "ADMIN") return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      className: "blk-sh"
+    }, isPartner ? "PARTNER PORTAL — ANDREW KELLY" : "ADMIN — ADHDAKOTA"), isPartner && /*#__PURE__*/React.createElement("div", {
+      style: {
+        marginBottom: 20
+      }
+    }, /*#__PURE__*/React.createElement(HoloFrame, {
+      size: 48,
+      intensity: "med",
+      style: {
+        background: "rgba(34,211,238,.04)",
+        border: "1px solid rgba(34,211,238,.3)",
+        padding: "16px 20px",
+        marginBottom: 14
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "flex",
+        alignItems: "center",
+        gap: 14,
+        flexWrap: "wrap"
+      }
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "var(--display)",
+        fontSize: 18,
+        letterSpacing: 3,
+        color: "var(--cyan)"
+      }
+    }, "ANDREW KELLY"), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "var(--mono)",
+        fontSize: 9,
+        color: "var(--t2)",
+        letterSpacing: 2,
+        marginTop: 2
+      }
+    }, "Networking & Business Development Partner")), /*#__PURE__*/React.createElement("div", {
+      style: {
+        marginLeft: "auto",
+        textAlign: "right"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "var(--mono)",
+        fontSize: 8,
+        color: "var(--t3)",
+        letterSpacing: 2
+      }
+    }, "TERRITORY"), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "var(--display)",
+        fontSize: 16,
+        color: "var(--cyan)"
+      }
+    }, "Mission, TX"), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "var(--mono)",
+        fontSize: 8,
+        color: "var(--t3)"
+      }
+    }, "Rio Grande Valley")), /*#__PURE__*/React.createElement("button", {
+      className: "lock-out",
+      style: {
+        borderColor: "var(--cyan)",
+        color: "var(--cyan)"
+      },
+      onClick: onLogout
+    }, "LOGOUT"))), /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: 12,
+        marginBottom: 16
+      }
+    }, /*#__PURE__*/React.createElement(HoloFrame, {
+      size: 36,
+      intensity: "low",
+      style: {
+        background: "var(--plate)",
+        border: "1px solid var(--wire)",
+        padding: "14px 16px"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "var(--mono)",
+        fontSize: 8,
+        color: "var(--t3)",
+        letterSpacing: 3,
+        marginBottom: 6
+      }
+    }, "DFW NODE"), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "var(--display)",
+        fontSize: 18,
+        color: "var(--sig)"
+      }
+    }, "ADHDAKOTA"), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "var(--mono)",
+        fontSize: 8,
+        color: "var(--t2)",
+        marginTop: 3
+      }
+    }, "Platform HQ · Dallas–Fort Worth"), /*#__PURE__*/React.createElement("div", {
+      style: {
+        marginTop: 8,
+        display: "flex",
+        alignItems: "center",
+        gap: 6
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: 6,
+        height: 6,
+        borderRadius: "50%",
+        background: "var(--ok)",
+        boxShadow: "0 0 6px var(--ok)",
+        animation: "pulse 2s infinite"
+      }
+    }), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontFamily: "var(--mono)",
+        fontSize: 8,
+        color: "var(--ok)"
+      }
+    }, "ACTIVE"))), /*#__PURE__*/React.createElement(HoloFrame, {
+      size: 36,
+      intensity: "med",
+      style: {
+        background: "var(--plate)",
+        border: "1px solid rgba(34,211,238,.2)",
+        padding: "14px 16px"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "var(--mono)",
+        fontSize: 8,
+        color: "var(--t3)",
+        letterSpacing: 3,
+        marginBottom: 6
+      }
+    }, "VALLEY NODE"), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "var(--display)",
+        fontSize: 18,
+        color: "var(--cyan)"
+      }
+    }, "A. KELLY"), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "var(--mono)",
+        fontSize: 8,
+        color: "var(--t2)",
+        marginTop: 3
+      }
+    }, "BD Lead · Mission, TX"), /*#__PURE__*/React.createElement("div", {
+      style: {
+        marginTop: 8,
+        display: "flex",
+        alignItems: "center",
+        gap: 6
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: 6,
+        height: 6,
+        borderRadius: "50%",
+        background: "var(--ok)",
+        boxShadow: "0 0 6px var(--ok)",
+        animation: "pulse 2s infinite 0.5s"
+      }
+    }), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontFamily: "var(--mono)",
+        fontSize: 8,
+        color: "var(--ok)"
+      }
+    }, "ACTIVE")))), /*#__PURE__*/React.createElement("div", {
+      className: "perm-list"
+    }, [{
+      label: "View all live diagnostic data",
+      ok: true
+    }, {
+      label: "Fault code reader + AI explain",
+      ok: true
+    }, {
+      label: "Performance dyno",
+      ok: true
+    }, {
+      label: "Share platform with prospects",
+      ok: true
+    }, {
+      label: "ECM parameter writes",
+      ok: false
+    }, {
+      label: "DTC clearing",
+      ok: false
+    }, {
+      label: "Forced DPF regen",
+      ok: false
+    }, {
+      label: "Admin revenue dashboard",
+      ok: false
+    }].map(p => /*#__PURE__*/React.createElement("div", {
+      key: p.label,
+      className: "perm-item"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: p.ok ? "perm-yes" : "perm-no"
+    }, p.ok ? "✓" : "✗"), p.label, ": ", p.ok ? "ENABLED" : "RESTRICTED")))), isAdmin ? /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      className: "unlock-bar"
+    }, /*#__PURE__*/React.createElement("span", null, "ADMIN ACTIVE — ADHDAKOTA"), /*#__PURE__*/React.createElement("span", {
+      style: {
+        marginLeft: 8,
+        fontFamily: "var(--mono)",
+        fontSize: 9,
+        color: "var(--t2)"
+      }
+    }, "codedkota.com"), /*#__PURE__*/React.createElement("button", {
+      className: "lock-out",
+      onClick: onLogout
+    }, "LOGOUT")), /*#__PURE__*/React.createElement("div", {
+      className: "perm-list"
+    }, [{
+      label: "ECM parameter writes",
+      ok: isAdmin
+    }, {
+      label: "DTC clearing",
+      ok: isAdmin
+    }, {
+      label: "Forced DPF regen",
+      ok: isAdmin
+    }, {
+      label: "Tune editor write access",
+      ok: isAdmin
+    }, {
+      label: "Ad inventory management",
+      ok: isAdmin
+    }, {
+      label: "Actuator tests",
+      ok: true
+    }, {
+      label: "AI analyst — unlimited",
+      ok: isAdmin
+    }, {
+      label: "Performance dyno",
+      ok: true
+    }].map(p => /*#__PURE__*/React.createElement("div", {
+      key: p.label,
+      className: "perm-item"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: p.ok ? "perm-yes" : "perm-no"
+    }, p.ok ? "✓" : "✗"), p.label, ": ", p.ok ? "ENABLED" : "RESTRICTED"))), /*#__PURE__*/React.createElement("div", {
+      style: {
+        marginTop: 20
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "blk-sh"
+    }, "REVENUE AGENT STATUS"), [{
+      label: "Lead Gen (Shop Ads)",
+      status: "ACTIVE",
+      revenue: "$0.40–$2.80/click"
+    }, {
+      label: "Parts Affiliate (DTC match)",
+      status: "ACTIVE",
+      revenue: "3–8% commission"
+    }, {
+      label: "B2B SaaS (Seat licensing)",
+      status: "PENDING",
+      revenue: "$49–$149/seat/mo"
+    }].map(r => /*#__PURE__*/React.createElement("div", {
+      key: r.label,
+      style: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "10px 0",
+        borderBottom: "1px solid var(--rim)",
+        fontFamily: "var(--mono)",
+        fontSize: 10
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: "var(--t2)"
+      }
+    }, r.label), /*#__PURE__*/React.createElement("span", {
+      className: "chip " + (r.status === "ACTIVE" ? "chip-ok" : "chip-warn"),
+      style: {
+        fontSize: 8
+      }
+    }, r.status), /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: "var(--sig2)"
+      }
+    }, r.revenue))))) : /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "var(--mono)",
+        fontSize: 10,
+        color: "var(--sig)",
+        padding: "8px 12px",
+        border: "1px solid var(--sigborder)",
+        background: "var(--sigf)",
+        marginBottom: 14,
+        letterSpacing: 1
+      }
+    }, "LOGGED IN AS MECHANIC — ADMIN FEATURES RESTRICTED"), /*#__PURE__*/React.createElement("div", {
+      className: "perm-list"
+    }, [{
+      label: "View all live data",
+      ok: true
+    }, {
+      label: "Run actuator tests",
+      ok: true
+    }, {
+      label: "AI analyst",
+      ok: true
+    }, {
+      label: "Performance dyno",
+      ok: true
+    }, {
+      label: "ECM parameter writes",
+      ok: false
+    }, {
+      label: "DTC clearing",
+      ok: false
+    }, {
+      label: "Forced DPF regen",
+      ok: false
+    }, {
+      label: "Tune editor writes",
+      ok: false
+    }].map(p => /*#__PURE__*/React.createElement("div", {
+      key: p.label,
+      className: "perm-item"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: p.ok ? "perm-yes" : "perm-no"
+    }, p.ok ? "✓" : "✗"), p.label, ": ", p.ok ? "ENABLED" : "RESTRICTED")))));
+    return null;
+  }
+  return /*#__PURE__*/React.createElement("div", {
+    className: "app-shell"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "app-holo-tl"
+  }, /*#__PURE__*/React.createElement(HoloCorner, {
+    size: 80,
+    intensity: "med"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "app-holo-tr"
+  }, /*#__PURE__*/React.createElement(HoloCorner, {
+    size: 80,
+    intensity: "med"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "app-holo-bl"
+  }, /*#__PURE__*/React.createElement(HoloCorner, {
+    size: 80,
+    intensity: "med"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "app-holo-br"
+  }, /*#__PURE__*/React.createElement(HoloCorner, {
+    size: 80,
+    intensity: "med"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "app-topbar"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "app-brand"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "app-bname"
+  }, "ADHDIKTED"), /*#__PURE__*/React.createElement("div", {
+    className: "app-bsub"
+  }, "codedkota.com"))), /*#__PURE__*/React.createElement("div", {
+    className: "app-right"
+  }, /*#__PURE__*/React.createElement(AdapterBadge, null), /*#__PURE__*/React.createElement("div", {
+    className: "app-seg",
+    style: {
+      cursor: "pointer",
+      color: "var(--alert)"
+    },
+    onClick: onLogout
+  }, "LOGOUT"))), /*#__PURE__*/React.createElement("div", {
+    className: "app-tabs"
+  }, TABS.map(t => /*#__PURE__*/React.createElement("div", {
+    key: t.id,
+    className: "app-tab" + (tab === t.id ? " on" : ""),
+    onClick: () => setTab(t.id)
+  }, t.label))), /*#__PURE__*/React.createElement("div", {
+    className: "app-main"
+  }, renderContent()));
+}
+
+/* ═══════════════════════════════════════
+   ROOT ROUTER
+═══════════════════════════════════════ */
+function ObdPanel() {
+  const [s, setS] = React.useState(ADOBD.snapshot());
+  const [ex, setEx] = React.useState({});
+  const [busy, setBusy] = React.useState(false);
+  React.useEffect(() => ADOBD.subscribe(setS), []);
+  const sup = ADOBD.caps(),
+    on = s.status === "connected",
+    ing = s.status === "connecting";
+  async function run(fn) {
+    setBusy(true);
+    try {
+      await fn();
+    } catch (e) {
+      alert(e.message);
+    }
+    setBusy(false);
+  }
+  async function explain(code) {
+    setEx(p => ({
+      ...p,
+      [code]: "..."
+    }));
+    let t = "AI unavailable.";
+    try {
+      const res = await aiFetch({
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 500,
+          system: AI_SYSTEM,
+          messages: [{
+            role: "user",
+            content: "OBD-II code " + code + " (" + ADOBD.describe(code) + "). Give likely causes (most common first), how to confirm, typical fix. Brief. EVIDENCE: " + JSON.stringify(evidence())
+          }]
+        })
+      });
+      const d = await res.json();
+      if (d && d.content) t = d.content.map(b => b.text || "").join("");
+    } catch (e) {}
+    setEx(p => ({
+      ...p,
+      [code]: t
+    }));
+  }
+  const mono = {
+    fontFamily: "var(--mono)",
+    fontSize: 10,
+    color: "var(--t2)",
+    lineHeight: 1.9
+  };
+  const row = (c, pend) => /*#__PURE__*/React.createElement("div", {
+    key: c + pend
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "dtc-row " + (pend ? "warn" : "alert")
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "dtc-code",
+    style: {
+      minWidth: 70
+    }
+  }, c), /*#__PURE__*/React.createElement("div", {
+    className: "dtc-desc"
+  }, ADOBD.describe(c)), /*#__PURE__*/React.createElement("div", {
+    className: "dtc-mod"
+  }, pend ? "PENDING" : "STORED"), /*#__PURE__*/React.createElement("button", {
+    className: "dtc-ai-btn",
+    onClick: () => ex[c] ? setEx(p => ({
+      ...p,
+      [c]: null
+    })) : explain(c)
+  }, ex[c] ? "HIDE" : "AI EXPLAIN")), ex[c] && /*#__PURE__*/React.createElement("div", {
+    className: "dtc-explain"
+  }, ex[c]));
+  const vals = Object.entries(s.values);
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "sim-notice",
+    style: {
+      color: on ? "var(--ok)" : "var(--cyan)"
+    }
+  }, on ? "CONNECTED · " + s.adapter + " · " + s.proto : "OBD-II ADAPTER · REAL VEHICLE DATA · ignition ON, then connect"), s.msg && /*#__PURE__*/React.createElement("div", {
+    style: {
+      ...mono,
+      color: s.status === "error" ? "var(--alert)" : "var(--t2)",
+      marginBottom: 12
+    }
+  }, s.msg), !on && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "blk-sh"
+  }, "CONNECT"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 10,
+      flexWrap: "wrap"
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "write-btn",
+    style: {
+      flex: 1,
+      margin: 0
+    },
+    disabled: ing || !sup.ble,
+    onClick: () => ADOBD.connectBLE()
+  }, ing ? "CONNECTING..." : "BLUETOOTH LE"), /*#__PURE__*/React.createElement("button", {
+    className: "write-btn",
+    style: {
+      flex: 1,
+      margin: 0
+    },
+    disabled: ing || !sup.serial,
+    onClick: () => ADOBD.connectSerial()
+  }, "USB SERIAL")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      ...mono,
+      marginTop: 16
+    }
+  }, !sup.ble && /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: "var(--sig2)"
+    }
+  }, "Bluetooth is blocked here. Use Chrome on Android or desktop, on the live https site (not an embedded preview)."), /*#__PURE__*/React.createElement("div", null, "OK  BLE ELM327 adapters (Vgate iCar Pro BLE, Veepeak BLE, OBDLink CX)"), /*#__PURE__*/React.createElement("div", null, "OK  USB ELM327 cables (desktop Chrome/Edge)"), /*#__PURE__*/React.createElement("div", null, "NO  Classic-Bluetooth and WiFi ELM327 clones: browsers cannot open them"), /*#__PURE__*/React.createElement("div", null, "NO  iPhone/Safari: no Web Bluetooth"), /*#__PURE__*/React.createElement("div", null, "Covers 1996+ cars and light trucks (generic OBD-II). Heavy-duty J1939 trucks need a different adapter."))), on && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "row-flex"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "blk-sh",
+    style: {
+      margin: 0
+    }
+  }, "VEHICLE"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8,
+      flexWrap: "wrap"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "chip " + (s.mil ? "chip-alert" : "chip-ok")
+  }, s.mil ? "CHECK ENGINE · " + s.nd + " CODES" : "MIL OFF"), s.vin && /*#__PURE__*/React.createElement("div", {
+    className: "chip chip-sig"
+  }, s.vin), /*#__PURE__*/React.createElement("button", {
+    className: "dtc-clr-btn",
+    onClick: () => ADOBD.disconnect()
+  }, "DISCONNECT"))), /*#__PURE__*/React.createElement("div", {
+    className: "gg"
+  }, vals.map(([k, o]) => /*#__PURE__*/React.createElement("div", {
+    key: k,
+    className: "gauge"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "g-lbl"
+  }, k), /*#__PURE__*/React.createElement("div", {
+    className: "g-val",
+    style: {
+      color: "var(--sig2)"
+    }
+  }, FMT(o.v), /*#__PURE__*/React.createElement("span", {
+    className: "g-unit"
+  }, o.u))))), !vals.length && /*#__PURE__*/React.createElement("div", {
+    style: mono
+  }, "Reading sensors..."), /*#__PURE__*/React.createElement("div", {
+    className: "blk-sh",
+    style: {
+      marginTop: 18
+    }
+  }, "TROUBLE CODES"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8,
+      flexWrap: "wrap",
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "dyno-btn",
+    style: {
+      margin: 0
+    },
+    disabled: busy,
+    onClick: () => run(() => ADOBD.readCodes())
+  }, "READ CODES"), /*#__PURE__*/React.createElement("button", {
+    className: "dyno-btn",
+    style: {
+      margin: 0
+    },
+    disabled: busy,
+    onClick: () => run(() => ADOBD.readPending())
+  }, "PENDING"), /*#__PURE__*/React.createElement("button", {
+    className: "dyno-btn",
+    style: {
+      margin: 0
+    },
+    disabled: busy,
+    onClick: () => run(() => ADOBD.readVIN())
+  }, "READ VIN"), /*#__PURE__*/React.createElement("button", {
+    className: "dyno-btn",
+    style: {
+      margin: 0,
+      borderColor: "var(--alert)",
+      color: "var(--alert)"
+    },
+    disabled: busy,
+    onClick: () => run(async () => {
+      if (confirm("Clear all codes? This also resets emissions readiness monitors and freeze-frame data, and the car may fail an inspection until it re-learns. Fix the cause first.")) { saveRecord(s); await ADOBD.clearCodes(); }
+    })
+  }, "CLEAR CODES")), s.read && !s.dtcs.length && !s.pending.length && /*#__PURE__*/React.createElement("div", {
+    style: {
+      ...mono,
+      color: "var(--ok)"
+    }
+  }, "NO STORED EMISSIONS CODES · other modules (ABS, airbag, transmission) not scanned"), /*#__PURE__*/React.createElement("div", {
+    className: "dtc-list"
+  }, s.dtcs.map(c => row(c, false)), s.pending.map(c => row(c, true)))), /*#__PURE__*/React.createElement("details", {
+    style: {
+      marginTop: 20
+    }
+  }, /*#__PURE__*/React.createElement("summary", {
+    style: mono
+  }, "RAW ADAPTER LOG"), /*#__PURE__*/React.createElement("pre", {
+    style: {
+      ...mono,
+      whiteSpace: "pre-wrap",
+      fontSize: 9
+    }
+  }, s.log.join("\n"))));
+}
+const AI_SYSTEM = "You are a cautious diagnostic assistant. You receive EVIDENCE as JSON. Rules: never state a root cause as fact; give ranked hypotheses with low/medium/high confidence, each tied to specific evidence items; name the cheapest confirming test before any part replacement; recommend a part only if a confirming test result is in the evidence; if evidence is insufficient, say so plainly; the scan covers emissions-related OBD-II only, so other modules are unknown; never advise defeating or deleting emissions equipment; put safety-critical issues first.";
+function evidence() {
+  const s = ADOBD.snapshot(),
+    now = Date.now(),
+    v = s.veh;
+  return {
+    connected: s.status === "connected",
+    vehicle: v && v.make ? {
+      make: v.make,
+      model: v.model,
+      year: v.year,
+      engine: v.engine
+    } : null,
+    check_engine_light: s.mil,
+    stored_codes: s.dtcs.map(c => ({
+      code: c,
+      meaning: ADOBD.describe(c)
+    })),
+    pending_codes: s.pending.map(c => ({
+      code: c,
+      meaning: ADOBD.describe(c)
+    })),
+    live_values: Object.fromEntries(Object.entries(s.values).map(([k, o]) => [k, {
+      value: +o.v.toFixed(1),
+      unit: o.u,
+      age_s: Math.round((now - o.t) / 1000)
+    }])),
+    scope: "Emissions-related OBD-II only (Mode 01/03/07). ABS, airbag, transmission and body modules NOT scanned.",
+    not_provided: ["freeze frame", "symptoms", "mileage", "service history", "confirming test results"]
+  };
+}
+function saveRecord(s) {
+  const b = new Blob([JSON.stringify({
+    time: new Date().toISOString(),
+    vin: s.vin,
+    vehicle: s.veh,
+    stored: s.dtcs,
+    pending: s.pending,
+    values: s.values
+  }, null, 2)], {
+    type: "application/json"
+  });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(b);
+  a.download = "adhdikted-before-clear-" + Date.now() + ".json";
+  a.click();
+}
+function useAD() {
+  const [s, setS] = React.useState(ADOBD.snapshot());
+  React.useEffect(() => ADOBD.subscribe(setS), []);
+  return s;
+}
+function AdapterBadge() {
+  const on = useAD().status === "connected";
+  return /*#__PURE__*/React.createElement("div", {
+    className: "app-seg"
+  }, on && /*#__PURE__*/React.createElement("div", {
+    className: "live-dot"
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: on ? "var(--ok)" : "var(--t3)"
+    }
+  }, on ? "ADAPTER LIVE" : "NO ADAPTER"));
+}
+function VehicleCard() {
+  const v = useAD().veh;
+  if (!v) return null;
+  const m = {
+    fontFamily: "var(--mono)",
+    fontSize: 10,
+    color: "var(--t2)",
+    lineHeight: 1.8
+  };
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      border: "1px solid var(--sigborder)",
+      background: "var(--sigf)",
+      padding: "12px 16px",
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "var(--display)",
+      fontSize: 22,
+      color: "var(--t)",
+      letterSpacing: 2
+    }
+  }, v.make ? [v.year, v.make, v.model].filter(Boolean).join(" ") : "Vehicle not identified"), /*#__PURE__*/React.createElement("div", {
+    style: m
+  }, v.engine, v.err ? " · " + v.err : ""), v.recalls && /*#__PURE__*/React.createElement("div", {
+    style: {
+      ...m,
+      marginTop: 6
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: v.recalls.length ? "var(--sig2)" : "var(--ok)"
+    }
+  }, v.recalls.length, " recall campaign(s) issued for this model year (NHTSA). Confirm status for this exact VIN at nhtsa.gov/recalls."), v.recalls.slice(0, 5).map(r => /*#__PURE__*/React.createElement("div", {
+    key: r.id
+  }, r.id, " · ", r.component))));
+}
+function LookupPanel() {
+  const [q, setQ] = React.useState("");
+  const [, tick] = React.useState(0);
+  React.useEffect(() => {
+    const t = setInterval(() => tick(x => x + 1), 1500);
+    return () => clearInterval(t);
+  }, []);
+  const t = q.trim().toUpperCase(),
+    J = window.ADJ,
+    n = window.ADDTC ? Object.keys(window.ADDTC).length : 0;
+  const dm = t.match(/^[PCBU][0-9A-F]{4}$/),
+    jm = t.match(/^(?:SPN\s*)?(\d{1,6})\s*(?:FMI|[-\/\s])\s*(\d{1,2})$/);
+  let out = null;
+  if (dm) out = {
+    k: t,
+    v: ADOBD.describe(t)
+  };else if (jm) out = {
+    k: "SPN " + jm[1] + " · FMI " + jm[2],
+    v: (J && J.spn[jm[1]] || "SPN name not in the curated list") + " — " + (J && J.fmi[jm[2]] || "unknown FMI")
+  };
+  const m = {
+    fontFamily: "var(--mono)",
+    fontSize: 10,
+    color: "var(--t2)",
+    lineHeight: 1.9
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "blk-sh"
+  }, "CODE LOOKUP"), /*#__PURE__*/React.createElement("input", {
+    className: "tsearch",
+    placeholder: "P0420  or  SPN 3251 FMI 0",
+    value: q,
+    onChange: e => setQ(e.target.value)
+  }), out && /*#__PURE__*/React.createElement("div", {
+    className: "dtc-row alert"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "dtc-code"
+  }, out.k), /*#__PURE__*/React.createElement("div", {
+    className: "dtc-desc"
+  }, out.v)), !out && t && /*#__PURE__*/React.createElement("div", {
+    style: m
+  }, "Enter an OBD-II code (P0420) or a J1939 pair (SPN 3251 FMI 0)."), /*#__PURE__*/React.createElement("div", {
+    style: {
+      ...m,
+      marginTop: 16
+    }
+  }, n ? "DTC dataset loaded: " + n + " generic powertrain (P) codes." : "DTC dataset not loaded: using a small built-in list.", " Chassis, body and network (C/B/U) codes and manufacturer-specific codes are not in the dataset. J1939 SPN names are a curated subset."));
+}
+function App() {
+  const [view, setView] = React.useState("landing"); // landing | login | app
+  const [auth, setAuth] = React.useState(null);
+  function handleAuth(role) {
+    setAuth(role);
+    setView("app");
+  }
+  function handleLogout() {
+    setAuth(null);
+    setView("landing");
+  }
+  function handleEnter() {
+    setView("login");
+  }
+  if (view === "landing") return /*#__PURE__*/React.createElement(Landing, {
+    onEnter: handleEnter
+  });
+  if (view === "login") return /*#__PURE__*/React.createElement(Login, {
+    onAuth: handleAuth
+  });
+  if (view === "app") return /*#__PURE__*/React.createElement(DiagApp, {
+    auth: auth,
+    onLogout: handleLogout
+  });
+  return null;
+}
+ReactDOM.createRoot(document.getElementById('root')).render(/*#__PURE__*/React.createElement(App, null));</script>
+</body>
+</html>
